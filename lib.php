@@ -154,6 +154,7 @@ function katest_delete_instance($id) {
     // Delete any dependent records here.
 
     $DB->delete_records('katest', array('id' => $katest->id));
+    $DB->delete_records('katest_skills',array('katestid'=>$katest->id));
 
     katest_grade_item_delete($katest);
 

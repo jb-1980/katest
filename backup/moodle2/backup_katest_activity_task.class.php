@@ -19,7 +19,7 @@
  *
  * @package   mod_katest
  * @category  backup
- * @copyright 2016 Your Name <your@email.address>
+ * @copyright 2016 Joseph Gilgen <gilgenlabs@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/mod/katest/backup/moodle2/backup_katest_stepslib.
  *
  * @package   mod_katest
  * @category  backup
- * @copyright 2016 Your Name <your@email.address>
+ * @copyright 2016 Joseph Gilgen <gilgenlabs@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_katest_activity_task extends backup_activity_task {

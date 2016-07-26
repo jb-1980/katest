@@ -19,7 +19,7 @@
  *
  * @package   mod_katest
  * @category  backup
- * @copyright 2016 Your Name <your@email.address>
+ * @copyright 2016 Joseph Gilgen <gilgenlabs@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die;
  *
  * @package   mod_katest
  * @category  backup
- * @copyright 2016 Your Name <your@email.address>
+ * @copyright 2016 Joseph Gilgen <gilgenlabs@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_katest_activity_structure_step extends backup_activity_structure_step {
@@ -50,7 +50,7 @@ class backup_katest_activity_structure_step extends backup_activity_structure_st
             'name', 'intro', 'introformat', 'grade'));
 
         // If we had more elements, we would build the tree here.
-
+        $kaskills = new backup_nested_element('katest_skills', array('id'))
         // Define data sources.
         $katest->set_source_table('katest', array('id' => backup::VAR_ACTIVITYID));
 

@@ -133,7 +133,7 @@ class mod_katest_mod_form extends moodleform_mod {
         global $DB;
         if(!empty($this->_instance) && ($skills = $DB->get_records('katest_skills',
               array('katestid'=>$this->_instance), 'position'))){
-            print_object($skills);
+
             foreach($skills as $key => $value){
                 $default_values['skillname['.$value->position.']'] = $value->skillname;
                 $default_values['skillid['.$value->position.']'] = $value->id;

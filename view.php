@@ -72,6 +72,7 @@ $PAGE->set_heading(format_string($course->fullname));
 
 // Output starts here.
 echo $OUTPUT->header();
+echo $OUTPUT->heading($katest->name);
 
 // Conditions to show the intro can change to look for own settings or whatever.
 if ($katest->intro) {
@@ -79,17 +80,19 @@ if ($katest->intro) {
 }
 
 // Replace the following lines with you own code.
-echo $OUTPUT->heading($katest->name);
+
 
 $kaskill = $DB->get_records('katest_skills',array('katestid'=>$katest->id),'position');
 
-$html = '';
+$html = "";
 foreach($kaskill as $key=>$skill){
     $position = $skill->position + 1;
     $slug = explode('~',$skill->skillname)[0];
     $html.= "<div>\n<a href='http://www.khanacademy.org/exercise/{$slug}' target='_blank' class='katest-skill-button'>\n";
     $html.= "Question {$position}\n</a>\n</div>";
 }
+
+$html.= "<div><div style='text-align:center;'><button class='katest-submit-button'>Submit test for grading</button></div></div>";
 echo $html;
 // Finish the page.
 echo $OUTPUT->footer();
