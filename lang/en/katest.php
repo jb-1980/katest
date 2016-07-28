@@ -28,9 +28,22 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['modulename'] = 'katest';
-$string['modulenameplural'] = 'katests';
-$string['modulename_help'] = 'This module allows you to select a series of skills from Khan Academy and use them as a test. It will collect data from Khan Academy based on when the student was taking the test, and use that data to assign a grade.';
+$string['consumerkey']='Consumer Key';
+$string['consumersecret']='Consumer Secret';
+$string['descconsumerkey']='The consumer key for the Khan API.';
+$string['descconsumersecret']='The consumer secret for the Khan API.';
+$string['headerconfig']='Khan Academy Import Settings';
+$string['descconfig'] = 'Set the consumer key and token for the Khan API.
+                         You can register your app and receive the keys at
+                         <a href="https://www.khanacademy.org/api-apps/register" target="_blank">
+                         https://www.khanacademy.org/api-apps/register</a>.';
+$string['modulename'] = 'Khan Academy Test';
+$string['modulenameplural'] = 'Khan Academy Tests';
+$string['modulename_help'] = 'This module allows you to select a series of skills
+                              from Khan Academy and use them as a test. It will
+                              collect data from Khan Academy based on when the
+                              student was taking the test, and use that data to
+                              assign a grade.';
 $string['katest:addinstance'] = 'Add a new katest';
 $string['katest:submit'] = 'Submit katest';
 $string['katest:view'] = 'View katest';
@@ -39,5 +52,5 @@ $string['katestname'] = 'KA Test name';
 $string['katestname_help'] = 'The name for your KA Test module';
 $string['katest'] = 'katest';
 $string['pluginadministration'] = 'katest administration';
-$string['pluginname'] = 'katest';
+$string['pluginname'] = 'Khan Academy Test';
 $string['question'] = 'Question';

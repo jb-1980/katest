@@ -14,6 +14,7 @@
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="100" SEQUENCE="false" COMMENT="The maximum grade. Can be negative to indicate the use of a scale."/>
+        <FIELD NAME="password" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="optional password for test"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -34,6 +35,25 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="katestid" UNIQUE="false" FIELDS="katestid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="katest_results" COMMENT="user results for the katest module are stored here">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"/>
+        <FIELD NAME="katestid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="katest mod the skill belongs to"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="ID of the user"/>
+        <FIELD NAME="skillname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="url slug of Khan Academy skill"/>
+        <FIELD NAME="hintused" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="boolean of whether a hint was used in this attempt"/>
+        <FIELD NAME="timetaken" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="time spent on the problem as reported from KA"/>
+        <FIELD NAME="correct" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Boolean of whether student got response correct"/>
+        <FIELD NAME="timedone" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Time completed as reported by KA"/>
+        <FIELD NAME="ip_address" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="ip address of user when skill completed as reported by KA"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="katestid_and_userid" UNIQUE="false" FIELDS="katestid,userid"/>
       </INDEXES>
     </TABLE>
   </TABLES>

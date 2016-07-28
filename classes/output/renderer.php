@@ -15,22 +15,37 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the version and other meta-info about the plugin
- *
- * Setting the $plugin->version to 0 prevents the plugin from being installed.
- * See https://docs.moodle.org/dev/version.php for more info.
+ * Renderer class for KA Test.
  *
  * @package    mod_katest
  * @copyright  2016 Joseph Gilgen <gilgenlabs@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_katest\output;
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die;
 
-$plugin->component = 'mod_katest';
-$plugin->version = 2016072700;
-$plugin->release = 'v0.0.2';
-$plugin->requires = 2015051101;
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->cron = 0;
-$plugin->dependencies = array();
+use plugin_renderer_base;
+
+/**
+ * Renderer class for KA Test.
+ *
+ * @package    mod_katest
+ * @copyright  2016 Joseph Gilgen <gilgenlabs@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class renderer extends plugin_renderer_base {
+
+    /**
+     * Defer to template.
+     *
+     * @param index_page $page
+     *
+     * @return string html for the page
+     */
+    public function render_index_page($page) {
+        $data = $page->export_for_template($this);
+        return parent::render_from_template('mod_katest/index_page', $data);
+    }
+
+}

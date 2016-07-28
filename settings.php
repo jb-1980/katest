@@ -15,10 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the version and other meta-info about the plugin
- *
- * Setting the $plugin->version to 0 prevents the plugin from being installed.
- * See https://docs.moodle.org/dev/version.php for more info.
+ * Khan Academy Test settings.
  *
  * @package    mod_katest
  * @copyright  2016 Joseph Gilgen <gilgenlabs@gmail.com>
@@ -27,10 +24,15 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_katest';
-$plugin->version = 2016072700;
-$plugin->release = 'v0.0.2';
-$plugin->requires = 2015051101;
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->cron = 0;
-$plugin->dependencies = array();
+$settings->add(new admin_setting_heading('katest_header',
+                                         get_string('headerconfig', 'mod_katest'),
+                                         get_string('descconfig', 'mod_katest')));
+
+$settings->add(new admin_setting_configtext('katest/consumer_key',
+                                                get_string('consumerkey', 'mod_katest'),
+                                                get_string('descconsumerkey', 'mod_katest'),
+                                                null));
+$settings->add(new admin_setting_configtext('katest/consumer_secret',
+                                                get_string('consumersecret', 'mod_katest'),
+                                                get_string('descconsumersecret', 'mod_katest'),
+                                                null));

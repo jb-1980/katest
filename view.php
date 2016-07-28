@@ -30,16 +30,16 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID, or
-$n  = optional_param('k', 0, PARAM_INT);  // ... katest instance ID - it should be named as the first character of the module.
+$k  = optional_param('k', 0, PARAM_INT);  // katest instance ID
 
 if ($id) {
-    $cm         = get_coursemodule_from_id('katest', $id, 0, false, MUST_EXIST);
-    $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $katest  = $DB->get_record('katest', array('id' => $cm->instance), '*', MUST_EXIST);
+    $cm     = get_coursemodule_from_id('katest', $id, 0, false, MUST_EXIST);
+    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    $katest = $DB->get_record('katest', array('id' => $cm->instance), '*', MUST_EXIST);
 } else if ($k) {
-    $katest  = $DB->get_record('katest', array('id' => $k), '*', MUST_EXIST);
-    $course     = $DB->get_record('course', array('id' => $katest->course), '*', MUST_EXIST);
-    $cm         = get_coursemodule_from_instance('katest', $katest->id, $course->id, false, MUST_EXIST);
+    $katest = $DB->get_record('katest', array('id' => $k), '*', MUST_EXIST);
+    $course = $DB->get_record('course', array('id' => $katest->course), '*', MUST_EXIST);
+    $cm     = get_coursemodule_from_instance('katest', $katest->id, $course->id, false, MUST_EXIST);
 } else {
     error('You must specify a course_module ID or an instance ID');
 }
@@ -54,11 +54,10 @@ $event->add_record_snapshot('course', $PAGE->course);
 $event->add_record_snapshot($PAGE->cm->modname, $katest);
 $event->trigger();
 
-$PAGE->requires->jquery();
-$PAGE->requires->js('/mod/katest/script.js');
+// $PAGE->requires->jquery();
+// $PAGE->requires->js('/mod/katest/script.js');
 
 // Print the page header.
-
 $PAGE->set_url('/mod/katest/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($katest->name));
 $PAGE->set_heading(format_string($course->fullname));
@@ -71,28 +70,31 @@ $PAGE->set_heading(format_string($course->fullname));
  */
 
 // Output starts here.
-echo $OUTPUT->header();
-echo $OUTPUT->heading($katest->name);
+$output = $PAGE->get_renderer('mod_katest');
+echo $output->header();
+echo $output->heading($katest->name);
 
 // Conditions to show the intro can change to look for own settings or whatever.
 if ($katest->intro) {
-    echo $OUTPUT->box(format_module_intro('katest', $katest, $cm->id), 'generalbox mod_introbox', 'katestintro');
+    echo $output->box(format_module_intro('katest', $katest, $cm->id), 'generalbox mod_introbox', 'katestintro');
 }
 
-// Replace the following lines with you own code.
 
+$page = new \mod_katest\output\index_page($katest);
+echo $output->render($page);
 
-$kaskill = $DB->get_records('katest_skills',array('katestid'=>$katest->id),'position');
+// $kaskill = $DB->get_records('katest_skills',array('katestid'=>$katest->id),'position');
+//
+// $html = "";
+// foreach($kaskill as $key=>$skill){
+//     $position = $skill->position + 1;
+//     $slug = explode('~',$skill->skillname)[0];
+//     $html.= "<div>\n<a href='http://www.khanacademy.org/exercise/{$slug}' target='_blank' class='katest-skill-button'>\n";
+//     $html.= "Question {$position}\n</a>\n</div>";
+// }
+//
+// $html.= "<div><div style='text-align:center;'><button class='katest-submit-button'>Submit test for grading</button></div></div>";
+// echo $html;
 
-$html = "";
-foreach($kaskill as $key=>$skill){
-    $position = $skill->position + 1;
-    $slug = explode('~',$skill->skillname)[0];
-    $html.= "<div>\n<a href='http://www.khanacademy.org/exercise/{$slug}' target='_blank' class='katest-skill-button'>\n";
-    $html.= "Question {$position}\n</a>\n</div>";
-}
-
-$html.= "<div><div style='text-align:center;'><button class='katest-submit-button'>Submit test for grading</button></div></div>";
-echo $html;
 // Finish the page.
-echo $OUTPUT->footer();
+echo $output->footer();

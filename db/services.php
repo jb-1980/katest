@@ -15,22 +15,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the version and other meta-info about the plugin
- *
- * Setting the $plugin->version to 0 prevents the plugin from being installed.
- * See https://docs.moodle.org/dev/version.php for more info.
+ * Khan Academy Test external services.
  *
  * @package    mod_katest
  * @copyright  2016 Joseph Gilgen <gilgenlabs@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+$functions = array(
 
-$plugin->component = 'mod_katest';
-$plugin->version = 2016072700;
-$plugin->release = 'v0.0.2';
-$plugin->requires = 2015051101;
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->cron = 0;
-$plugin->dependencies = array();
+    'mod_katest_post_grade' => array(
+        'classname'   => 'mod_katest\external',
+        'methodname'  => 'post_grade',
+        'classpath'   => '',
+        'description' => 'User Khan API to set a grade for user',
+        'type'        => 'write',
+        'capabilities'=> '',
+    ),
+
+    'mod_katest_check_password' => array(
+        'classname'   => 'mod_katest\external',
+        'methodname'  => 'check_password',
+        'classpath'   => '',
+        'description' => 'Authenticates for a test that has an assigned password',
+        'type'        => 'read',
+        'capabilities'=> '',
+    )
+);
