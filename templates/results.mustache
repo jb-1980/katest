@@ -1,0 +1,21 @@
+<div data-region="katest-results">
+  <h4>Quiz Grade: {{grade}}</h4>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Skill Name</th>
+        <th>correct</th>
+        <th>time taken</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#results}}
+      <tr>
+        <th>{{skillname}}</th>
+        <th>{{correct}}</th>
+        <th>{{timetaken}}</th>
+      </tr>
+      {{/results}}
+    </tbody>
+  </table>
+</div>

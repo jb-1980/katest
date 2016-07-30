@@ -46,13 +46,18 @@ function xmldb_katest_upgrade($oldversion) {
      *
      */
 
-    if ($oldversion < 2016072700) {
+    if ($oldversion < 2016072801) {
 
-        // Define table katest to be created.
+        // Define table katest to be updated.
         $katest = new xmldb_table('katest');
 
         // Adding fields to table katest.
-        $katest->add_field('password', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $password = new xmldb_field('password', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+
+        // Conditionally launch add field.
+        if (!$dbman->field_exists($katest, $password)) {
+            $dbman->add_field($katest, $password);
+        }
 
         // Define table katest_results to be created.
         $katest_results = new xmldb_table('katest_results');
@@ -74,8 +79,13 @@ function xmldb_katest_upgrade($oldversion) {
         // Adding indexes to table katest_results.
         $katest_results->add_index('katestid_and_userid', XMLDB_INDEX_NOTUNIQUE, array('katestid', 'userid'));
 
+        // Conditionally launch create table for katest.
+        if (!$dbman->table_exists($katest_results)) {
+            $dbman->create_table($katest_results);
+        }
+
         // Katest savepoint reached.
-        upgrade_mod_savepoint(true, 2016072700, 'katest');
+        upgrade_mod_savepoint(true, 2016072801, 'katest');
     }
     return true;
 }

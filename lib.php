@@ -78,7 +78,7 @@ function katest_add_instance(stdClass $katest, mod_katest_mod_form $mform = null
     global $DB;
 
     $katest->timecreated = time();
-
+    print_object($katest);
     $katest->id = $DB->insert_record('katest', $katest);
     if($katest->id){
         foreach ($katest->skillname as $key => $val){

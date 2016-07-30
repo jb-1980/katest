@@ -43,9 +43,45 @@ class renderer extends plugin_renderer_base {
      *
      * @return string html for the page
      */
-    public function render_index_page($page) {
+    public function render_index($page) {
         $data = $page->export_for_template($this);
         return parent::render_from_template('mod_katest/index_page', $data);
     }
+
+    /**
+     * Defer to template.
+     *
+     * @param password $page
+     *
+     * @return string html for the page
+     */
+    public function render_password($page) {
+        $data = $page->export_for_template($this);
+        return parent::render_from_template('mod_katest/password', $data);
+    }
+
+    /**
+     * Defer to template.
+     *
+     * @param khan_authenticate $page
+     *
+     * @return string html for the page
+     */
+     public function render_khan_authenticate($page) {
+         $data = $page->export_for_template($this);
+         return parent::render_from_template('mod_katest/khan_authenticate', $data);
+     }
+
+     /**
+      * Defer to template.
+      *
+      * @param results $page
+      *
+      * @return string html for the page
+      */
+      public function render_results($page) {
+          $data = $page->export_for_template($this);
+          return parent::render_from_template('mod_katest/results', $data);
+      }
 
 }

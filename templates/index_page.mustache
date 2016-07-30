@@ -21,11 +21,7 @@
 
 }}
 <div data-region="index-page">
-  <div>
-    <label for="katest-password">Password</label>
-    <input type="text" id="katest-password"/>
-  </div>
-  <div id="katest-questions" style="display:none;">
+  <div id="katest-questions">
   {{#questions}}
     <div>
       <a href="http://www.khanacademy.org/exercise/{{skillname}}" target='_blank' class='katest-skill-button'>
@@ -35,9 +31,18 @@
   {{/questions}}
 </div>
   <div>
-    <div style='text-align:center;'>
-      <button class='katest-submit-button'>Submit test for grading</button>
-    </div>
+    <form id="katest-get-results-form" action="results.php" method="get">
+        <input type="hidden" name="timestarted" value="{{timestarted}}"/>
+        <input type="hidden" name="timesubmitted" value="0"/>
+        <input type="hidden" name="id" value="{{courseid}}"/>
+        <input type="hidden" name="k" value="{{katestid}}"/>
+        <div style='text-align:center;'>
+          <button class='btn btn-primary' id="katest-submit-button">
+              Submit test for grading
+          </button>
+        </div>
+    </form>
+
   </div>
 </div>
 {{#js}}

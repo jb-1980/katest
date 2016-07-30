@@ -37,6 +37,7 @@ $string['descconfig'] = 'Set the consumer key and token for the Khan API.
                          You can register your app and receive the keys at
                          <a href="https://www.khanacademy.org/api-apps/register" target="_blank">
                          https://www.khanacademy.org/api-apps/register</a>.';
+$string['error_msg'] = "Incorrect password";
 $string['modulename'] = 'Khan Academy Test';
 $string['modulenameplural'] = 'Khan Academy Tests';
 $string['modulename_help'] = 'This module allows you to select a series of skills
@@ -47,6 +48,7 @@ $string['modulename_help'] = 'This module allows you to select a series of skill
 $string['katest:addinstance'] = 'Add a new katest';
 $string['katest:submit'] = 'Submit katest';
 $string['katest:view'] = 'View katest';
+$string['katest:viewreports'] = 'View katest results';
 $string['katestfieldset'] = 'Skills to include on test';
 $string['katestname'] = 'KA Test name';
 $string['katestname_help'] = 'The name for your KA Test module';

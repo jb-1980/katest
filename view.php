@@ -28,9 +28,15 @@
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
+require_once(dirname(__FILE__).'/locallib.php');
 
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID, or
 $k  = optional_param('k', 0, PARAM_INT);  // katest instance ID
+
+// tokens returned from authenticating with KA
+$oauth_token = optional_param('oauth_token',null,PARAM_RAW);
+$oauth_token_secret = optional_param('oauth_token_secret',null,PARAM_RAW);
+$oauth_verifier = optional_param('oauth_verifier',null,PARAM_RAW);
 
 if ($id) {
     $cm     = get_coursemodule_from_id('katest', $id, 0, false, MUST_EXIST);
@@ -42,6 +48,31 @@ if ($id) {
     $cm     = get_coursemodule_from_instance('katest', $katest->id, $course->id, false, MUST_EXIST);
 } else {
     error('You must specify a course_module ID or an instance ID');
+}
+
+$katest_id = $katest->id;
+// after authenticating with khan academy, store tokens in $SESSION, this should
+// happen after user has entered quiz password if required, and clicked the
+// Khan Academy login button in quiz
+if($oauth_token and $oauth_token_secret and $oauth_verifier){
+    $consumer_obj = get_config('katest');
+    $args = array(
+        'api_root'=>'http://www.khanacademy.org/',
+        'oauth_consumer_key'=>$consumer_obj->consumer_key,
+        'oauth_consumer_secret'=>$consumer_obj->consumer_secret,
+        'request_token_api'=>'http://www.khanacademy.org/api/auth/request_token',
+        'access_token_api'=>'http://www.khanacademy.org/api/auth/access_token',
+        'oauth_callback'=>"{$CFG->wwwroot}/mod/katest/view.php?id={$id}"
+    );
+    $khanacademy = new khan_oauth($args);
+    $tokens = $khanacademy->get_access_token($oauth_token,$oauth_token_secret,$oauth_verifier);
+    if(isset($SESSION->khanacademy_tokens)){
+        $SESSION->khanacademy_tokens->$katest_id = $tokens;
+    } else{
+        $SESSION->khanacademy_tokens = new stdClass;
+        $SESSION->khanacademy_tokens->$katest_id = $tokens;
+    }
+
 }
 
 require_login($course, true, $cm);
@@ -80,21 +111,38 @@ if ($katest->intro) {
 }
 
 
-$page = new \mod_katest\output\index_page($katest);
-echo $output->render($page);
 
-// $kaskill = $DB->get_records('katest_skills',array('katestid'=>$katest->id),'position');
-//
-// $html = "";
-// foreach($kaskill as $key=>$skill){
-//     $position = $skill->position + 1;
-//     $slug = explode('~',$skill->skillname)[0];
-//     $html.= "<div>\n<a href='http://www.khanacademy.org/exercise/{$slug}' target='_blank' class='katest-skill-button'>\n";
-//     $html.= "Question {$position}\n</a>\n</div>";
-// }
-//
-// $html.= "<div><div style='text-align:center;'><button class='katest-submit-button'>Submit test for grading</button></div></div>";
-// echo $html;
+if($katest->password) {
+    if(isset($SESSION->khanacademy_tokens)
+       && property_exists($SESSION->khanacademy_tokens,$katest_id)){
+        $page = new \mod_katest\output\index($katest);
+        echo $output->render($page);
+    } else {
+        $password = optional_param('password', null, PARAM_RAW);
+        if($password && data_submitted()){
+            if($password == $katest->password){
+                $page = new \mod_katest\output\khan_authenticate($id);
+                echo $output->render($page);
+            } else{
+                $msg = get_string('error_msg', 'katest');
+                $page = new \mod_katest\output\password($msg);
+                echo $output->render($page);
+            }
+        } else {
+            $page = new \mod_katest\output\password();
+            echo $output->render($page);
+        }
+    }
+} else {
+    if(isset($SESSION->khanacademy_tokens)
+       && property_exists($SESSION->khanacademy_tokens,$katest_id)){
+        $page = new \mod_katest\output\index($katest);
+        echo $output->render($page);
+    } else{
+        $page = new \mod_katest\output\khan_authenticate($id);
+        echo $output->render($page);
+    }
+}
 
 // Finish the page.
 echo $output->footer();

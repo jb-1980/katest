@@ -14,23 +14,44 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
 /**
- * Defines the version and other meta-info about the plugin
- *
- * Setting the $plugin->version to 0 prevents the plugin from being installed.
- * See https://docs.moodle.org/dev/version.php for more info.
+ * Class containing data for index page
  *
  * @package    mod_katest
  * @copyright  2016 Joseph Gilgen <gilgenlabs@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_katest\output;
 
-defined('MOODLE_INTERNAL') || die();
+//require_once("$CFG->dirroot/webservice/externallib.php");
 
-$plugin->component = 'mod_katest';
-$plugin->version = 2016072900;
-$plugin->release = 'v0.0.2';
-$plugin->requires = 2015051101;
-$plugin->maturity = MATURITY_ALPHA;
-$plugin->cron = 0;
-$plugin->dependencies = array();
+use renderable;
+use templatable;
+use renderer_base;
+use stdClass;
+
+/**
+ * Class containing data for password page
+ *
+ * @copyright  2016 Joseph Gilgen <gilgenlabs@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class khan_authenticate implements renderable, templatable {
+    /** @var $id, the course id */
+    var $id = null;
+
+    public function __construct($id){
+      $this->id = $id;
+    }
+    /**
+     * Export this data so it can be used as the context for a mustache template.
+     *
+     * @return stdClass
+     */
+    public function export_for_template(renderer_base $output) {
+        $data = new stdClass;
+        $data->id = $this->id;
+        return $data;
+    }
+}

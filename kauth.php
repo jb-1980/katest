@@ -1,3 +1,4 @@
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,31 +15,29 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This is an empty module, that is required before all other modules.
- * Because every module is returned from a request for any other module, this
- * forces the loading of all modules with a single request.
+ * Prints a particular instance of katest
  *
- * @module     mod_katest/katest
+ * You can have a rather longer description of the file as well,
+ * if you like, and it can span multiple lines.
+ *
  * @package    mod_katest
  * @copyright  2016 Joseph Gilgen <gilgenlabs@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @since      2.9
  */
-define(['jquery'], function($) {
-    return /** @alias module:mod_katest/katest */ {
 
-        setButtions: function(){
-            $('.katest-skill-button').click(function() {
-              $(this).addClass('katest-disabled');
-            });
-        },
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(__FILE__).'/locallib.php');
 
-        submitTest: function(){
-          $('#katest-submit-button').click(function() {
-            var time = Math.floor(Date.now() / 1000);
-            $("input[name='timesubmitted']").val(time);
-            $("#katest-get-results-form").submit();
-          });
-        }
-    };
-});
+$id = optional_param('id', 0, PARAM_INT);
+
+$consumer_obj = get_config('katest');
+$args = array(
+    'api_root'=>'http://www.khanacademy.org/',
+    'oauth_consumer_key'=>$consumer_obj->consumer_key,
+    'oauth_consumer_secret'=>$consumer_obj->consumer_secret,
+    'request_token_api'=>'http://www.khanacademy.org/api/auth/request_token',
+    'access_token_api'=>'http://www.khanacademy.org/api/auth/access_token',
+    'oauth_callback'=>"{$CFG->wwwroot}/mod/katest/view.php?id={$id}"
+);
+$khanacademy = new khan_oauth($args);
+$khanacademy->request_token();

@@ -27,8 +27,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once($CFG->libdir.'/oauthlib.php');
 
-include_once($CFG->libdir.'/oauthlib.php');
 class khan_oauth extends oauth_helper {
     /**
      * Request token for authentication
@@ -58,7 +59,6 @@ class khan_oauth extends oauth_helper {
                 if(!empty($value)){
                     sort($value);
                     foreach($value as $k=>$v){
-                        //print_object($v);
                         $total[] = $param.'='.rawurlencode($v);
                     }
                 }
@@ -124,4 +124,117 @@ class khan_oauth extends oauth_helper {
         // return request return value
         return $content;
     }
+}
+
+/**
+ * Calculate the quiz grade
+ *
+ * @param stdClass $katest
+ * @return string
+ */
+function get_khan_results($katest, $kaskills, $timestarted, $timesubmitted){
+    global $USER, $DB, $SESSION;
+
+    // get data from Khan Academy and use to create a grade.
+
+    // 1. Create khan academy auth object
+    $consumer_obj = get_config('katest');
+    $args = array(
+        'api_root'=>'http://www.khanacademy.org/',
+        'oauth_consumer_key'=>$consumer_obj->consumer_key,
+        'oauth_consumer_secret'=>$consumer_obj->consumer_secret,
+        'request_token_api'=>'http://www.khanacademy.org/api/auth/request_token',
+        'access_token_api'=>'http://www.khanacademy.org/api/auth/access_token',
+    );
+    $khanacademy = new khan_oauth($args);
+
+    // 2. Get list of skills on quiz
+    $kaskills = $DB->get_records('katest_skills',array('katestid'=>$katest->id));
+
+    // 3. Get data for each skill
+    $katest_id = $katest->id;
+    $tokens = $SESSION->khanacademy_tokens->$katest_id;
+
+    $params = array('dt_end'=>$timesubmitted,'dt_start'=>$timestarted);
+    $token = $tokens['oauth_token'];
+    $secret = $tokens['oauth_token_secret'];
+
+    $results = array();
+    foreach($kaskills as $k=>$skill){
+        $skillname = explode('~',$skill->skillname)[0];
+        $url = "http://www.khanacademy.org/api/v1/user/exercises/{$skillname}/log";
+        $response = json_decode($khanacademy->request('GET',$url,$params,$token,$secret));
+
+        foreach($response as $key => $val){
+            $result = new stdClass;
+            $result->katestid = $katest_id;
+            $result->userid = $USER->id;
+            $result->skillname = $skill->skillname;
+            $result->hintused = $val->hint_used ? 1 : 0;
+            $result->timetaken = $val->time_taken;
+            $result->correct = $val->correct ? 1 : 0;
+            $result->timedone = strtotime($val->time_done);
+            $result->ip_address = $val->ip_address;
+            $results[] = $result;
+        }
+    }
+
+    return $results;
+}
+
+/**
+ * calculate the quiz grade and store it in the database
+ *
+ * @param array $results the results array of the Khan Academy data
+ * @param stdClass $katest, the katest object;
+ * @param stdClass $kaskills, the kaskills object
+ * @return float
+ */
+function get_grade_data($results, $katest, $kaskills){
+    $total = count($kaskills);
+
+    $grades = array();
+    foreach($results as $k=>$result){
+        if(array_key_exists($result->skillname, $grades)){
+            $grades[$result->skillname][] = $result;
+        } else {
+            $grades[$result->skillname] = array($result);
+        }
+    }
+
+    $num = 0;
+    foreach($grades as $k=>$grade){
+        $correct = false;
+        foreach($grade as $key=> $g){
+            if($g->correct){
+                $correct = true;
+                break;
+            }
+        }
+
+        switch (true) {
+            case !$correct:
+                break;
+            case count($grade) == 1:
+                $num++;
+                break;
+            case count($grade) == 2:
+                $num += 0.8;
+                break;
+            case count($grade) == 3:
+                $num += 0.5;
+        }
+    }
+    $finalgrade = $total ? $num/$total*$katest->grade : null;
+
+    global $USER;
+    if($finalgrade){
+        $gradeitem = new grade_item(array(
+            'courseid'=>$katest->course,
+            'itemmodule'=>'katest',
+            'iteminstance'=>$katest->id));
+        $gradeitem->update_raw_grade($USER->id, $finalgrade);
+    }
+
+    return $finalgrade.'/'.$katest->grade;
 }

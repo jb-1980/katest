@@ -52,10 +52,8 @@ class external extends external_api {
         return new external_function_parameters(
             array(
               'userid' => new external_value(PARAM_INT, 'some user id'),
-              'access_token' => new external_value(PARAM_ALPHANUM, 'Khan Oauth access token'),
-              'access_token_secret' => new external_value(PARAM_ALPHANUM, 'Khan Oauth access token secret'),
+              'katestid' => new external_value(PARAM_INT, 'the katest module id'),
               'timesubmitted' => new external_value(PARAM_INT, 'UTC Unix timestamp')
-
             )
         );
     }
@@ -71,16 +69,42 @@ class external extends external_api {
     /**
      * Collect data from Khan Academy using their API, and post a grade.
      */
-    public static function post_grade($userid,$timesubmitted) {
+    public static function post_grade($userid,$katestid,$timesubmitted) {
         global $DB;
 
         $params = self::validate_parameters(self:post_grade_parameters(),
-            array('userid' => $userid, 'timesubmitted'=> $timesubmitted));
+            array('userid' => $userid,
+                  'katestid' => $katestid,
+                  'timesubmitted'=> $timesubmitted));
 
-
+        // get user object from database to update grades for
         $user = $DB->get_record('user',array('id',$params['userid']));
-        $kapi = new khan_oauth($)
 
+        // get data from Khan Academy and use to create a grade.
+
+        // 1. Create khan academy auth object
+        $consumer_obj = get_config('katest');
+        $args = array(
+            'api_root'=>'http://www.khanacademy.org/',
+            'oauth_consumer_key'=>$consumer_obj->consumer_key,
+            'oauth_consumer_secret'=>$consumer_obj->consumer_secret,
+            'request_token_api'=>'http://www.khanacademy.org/api/auth/request_token',
+            'access_token_api'=>'http://www.khanacademy.org/api/auth/access_token',
+            'oauth_callback'=>"{$CFG->wwwroot}/mod/katest/view.php?id={$id}"
+        );
+        $khanacademy = new khan_oauth($args);
+
+        // 2. Get list of skills on quiz
+        $kaskills = $DB->get_records('katest_skills',array('katestid'=>$params->katestid));
+
+        // 3. Get data for each skill
+        $url = 'https://www.khanacadey.org/api/v2/user/'
+        $tokens = $SESSION->
+        foreach($kaskills as $k=>$skill){
+
+        }
+
+        $response = $khanacademy->request('GET', $url, $params = array(), $token = '', $secret = '')
     }
 
     /**

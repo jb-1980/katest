@@ -36,7 +36,7 @@ use stdClass;
  * @copyright  2016 Joseph Gilgen <gilgenlabs@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class index_page implements renderable, templatable {
+class index implements renderable, templatable {
     /** @var $katest, the katest module */
     var $katest = null;
 
@@ -50,16 +50,20 @@ class index_page implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output) {
         global $DB;
+        $katest = $this->katest;
 
-        $kaskills = $DB->get_records('katest_skills',array('katestid'=>$this->katest->id),'position');
+        $kaskills = $DB->get_records('katest_skills',array('katestid'=>$katest->id),'position');
 
         $data = new stdClass();
         $data->questions = array();
         foreach($kaskills as $k=>$v){
             $v->position = $v->position + 1;
+            $v->skillname = explode('~',$v->skillname)[0];
             $data->questions[] = $v;
         }
-
+        $data->timestarted = time();
+        $data->courseid = $katest->course;
+        $data->katestid = $katest->id;
         return $data;
     }
 }
