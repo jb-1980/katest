@@ -94,7 +94,7 @@ function xmldb_katest_upgrade($oldversion) {
         $katest = new xmldb_table('katest');
 
         // Adding fields to table katest.
-        $attempts = new xmldb_field('attempts', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'attempts');
+        $attempts = new xmldb_field('attempts', XMLDB_TYPE_INTEGER, '10', null, null,null,null);
         // Conditionally launch add field.
         if (!$dbman->field_exists($katest, $attempts)) {
             $dbman->add_field($katest, $attempts);
