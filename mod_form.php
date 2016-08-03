@@ -138,17 +138,17 @@ class mod_katest_mod_form extends moodleform_mod {
         global $DB;
         if(!empty($this->_instance)){
             $default_values['attempts'] = $this->current->attempts;
-            print_object($this->current);
+
+            if(($skills = $DB->get_records('katest_skills',
+              array('katestid'=>$this->_instance), 'position'))){
+
+                foreach($skills as $key => $value){
+                    $default_values['skillname['.$value->position.']'] = $value->skillname;
+                    $default_values['skillid['.$value->position.']'] = $value->id;
+                }
+
+            }
+
         }
-        // } && ($skills = $DB->get_records('katest_skills',
-        //       array('katestid'=>$this->_instance), 'position'))){
-        //
-        //     foreach($skills as $key => $value){
-        //         $default_values['skillname['.$value->position.']'] = $value->skillname;
-        //         $default_values['skillid['.$value->position.']'] = $value->id;
-        //     }
-        //
-        //
-        // }
     }
 }
