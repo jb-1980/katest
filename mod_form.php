@@ -119,6 +119,11 @@ class mod_katest_mod_form extends moodleform_mod {
         $this->repeat_elements($repeatarray, $repeatno,
                     $repeateloptions, 'option_repeats', 'option_add_fields', 3, null, true);
 
+        $mform->addElement('header', 'katestaccesssettings', 'Access Settings');
+        $mform->addElement('text', 'attempts', 'Number of attempts');
+        $mform->setType('attempts',PARAM_INT);
+        $mform->addElement('passwordunmask', 'password', 'password');
+
         // Add standard grading elements.
         $this->standard_grading_coursemodule_elements();
 
@@ -131,14 +136,19 @@ class mod_katest_mod_form extends moodleform_mod {
 
     function data_preprocessing(&$default_values){
         global $DB;
-        if(!empty($this->_instance) && ($skills = $DB->get_records('katest_skills',
-              array('katestid'=>$this->_instance), 'position'))){
-
-            foreach($skills as $key => $value){
-                $default_values['skillname['.$value->position.']'] = $value->skillname;
-                $default_values['skillid['.$value->position.']'] = $value->id;
-            }
-
+        if(!empty($this->_instance)){
+            $default_values['attempts'] = $this->current->attempts;
+            print_object($this->current);
         }
+        // } && ($skills = $DB->get_records('katest_skills',
+        //       array('katestid'=>$this->_instance), 'position'))){
+        //
+        //     foreach($skills as $key => $value){
+        //         $default_values['skillname['.$value->position.']'] = $value->skillname;
+        //         $default_values['skillid['.$value->position.']'] = $value->id;
+        //     }
+        //
+        //
+        // }
     }
 }

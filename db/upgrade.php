@@ -87,5 +87,21 @@ function xmldb_katest_upgrade($oldversion) {
         // Katest savepoint reached.
         upgrade_mod_savepoint(true, 2016072801, 'katest');
     }
+
+    if ($oldversion < 2016080300) {
+
+        // Define table katest to be updated.
+        $katest = new xmldb_table('katest');
+
+        // Adding fields to table katest.
+        $attempts = new xmldb_field('attempts', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'attempts');
+        // Conditionally launch add field.
+        if (!$dbman->field_exists($katest, $attempts)) {
+            $dbman->add_field($katest, $attempts);
+        }
+
+        // Katest savepoint reached.
+        upgrade_mod_savepoint(true, 2016080300, 'katest');
+    }
     return true;
 }

@@ -53,10 +53,10 @@ $PAGE->set_heading(format_string($course->fullname));
 $output = $PAGE->get_renderer('mod_katest');
 echo $output->header();
 
-if(has_capability('mod/katest:viewreports', $PAGE->context)){
-    echo 'Grade reports coming soon';
+#if(has_capability('mod/katest:viewreports', $PAGE->context)){
+#    echo 'Grade reports coming soon';
 
-} else{
+#} else{
 
 
     echo $output->heading($katest->name.' results for '.$USER->firstname.' '.$USER->lastname);
@@ -84,6 +84,6 @@ if(has_capability('mod/katest:viewreports', $PAGE->context)){
     $grade = get_grade_data($results, $katest, $kaskills);
     $page = new \mod_katest\output\results($results, $grade);
     echo $output->render($page);
-}
+//}
 // Finish the page.
 echo $output->footer();
