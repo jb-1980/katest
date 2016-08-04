@@ -28,7 +28,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once($CFG->dirroot.'/lib/grade/grade_item.php');
+require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->libdir.'/oauthlib.php');
 
 class khan_oauth extends oauth_helper {

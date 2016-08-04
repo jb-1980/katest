@@ -57,6 +57,7 @@ class results implements renderable, templatable {
         $data = new stdClass;
         $data->results = array();
         foreach($this->results as $k=>$result){
+            $result->skillname = explode('~',$result->skillname)[1];
             $data->results[] = $result;
         }
         $data->grade = $this->grade;

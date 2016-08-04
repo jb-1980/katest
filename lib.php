@@ -49,16 +49,11 @@ define('KATEST_ULTIMATE_ANSWER', 42);
 function katest_supports($feature) {
 
     switch($feature) {
-        case FEATURE_MOD_INTRO:
-            return true;
-        case FEATURE_SHOW_DESCRIPTION:
-            return true;
-        case FEATURE_GRADE_HAS_GRADE:
-            return true;
-        case FEATURE_BACKUP_MOODLE2:
-            return true;
-        default:
-            return null;
+        case FEATURE_MOD_INTRO:          return true;
+        case FEATURE_SHOW_DESCRIPTION:   return true;
+        case FEATURE_GRADE_HAS_GRADE:    return true;
+        case FEATURE_BACKUP_MOODLE2:     return true;
+        default:                         return null;
     }
 }
 

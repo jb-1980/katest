@@ -57,7 +57,6 @@ class index implements renderable, templatable {
 
         $kaskills = $DB->get_records('katest_skills',array('katestid'=>$katest->id),'position');
 
-        echo 'The count is '.$this->attempt;
         $data = new stdClass();
         $data->questions = array();
         foreach($kaskills as $k=>$v){
