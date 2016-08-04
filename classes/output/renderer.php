@@ -84,4 +84,16 @@ class renderer extends plugin_renderer_base {
           return parent::render_from_template('mod_katest/results', $data);
       }
 
+      /**
+       * Defer to template.
+       *
+       * @param results $page
+       *
+       * @return string html for the page
+       */
+       public function render_attempts_exceeded($page) {
+           $data = $page->export_for_template($this);
+           return parent::render_from_template('mod_katest/attempts_exceeded', $data);
+       }
+
 }

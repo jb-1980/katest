@@ -43,6 +43,8 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"/>
         <FIELD NAME="katestid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="katest mod the skill belongs to"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="ID of the user"/>
+        <FIELD NAME="katestattempt" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Test attempt number"/>
+        <FIELD NAME="problemattempt" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Khan Skill attempt number"/>
         <FIELD NAME="skillname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="url slug of Khan Academy skill"/>
         <FIELD NAME="hintused" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="boolean of whether a hint was used in this attempt"/>
         <FIELD NAME="timetaken" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="time spent on the problem as reported from KA"/>

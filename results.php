@@ -34,6 +34,7 @@ $id = required_param('id', PARAM_INT); // Course ID, or
 $k  = required_param('k', PARAM_INT);  // katest instance ID
 $timestarted  = optional_param('timestarted', 0,PARAM_INT);
 $timesubmitted = optional_param('timesubmitted', 0,PARAM_INT);
+$attempt = optional_param('attempt',0,PARAM_INT);
 
 $katest = $DB->get_record('katest', array('id' => $k), '*', MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $katest->course), '*', MUST_EXIST);
@@ -65,13 +66,11 @@ echo $output->header();
     if($timestarted && $timesubmitted){
         $timestarted = gmdate('Y-m-d\TH:i:s\Z',$timestarted);
         $timesubmitted = gmdate('Y-m-d\TH:i:s\Z',$timesubmitted);
-        $results = get_khan_results($katest, $kaskills, $timestarted, $timesubmitted);
+        $results = get_khan_results($katest, $kaskills, $timestarted, $timesubmitted,$attempt);
         $transaction = $DB->start_delegated_transaction();
         foreach($results as $skillname=>$result){
-            if(!$record = $DB->get_record('katest_results',array(
-                    'katestid'=>$result->katestid,
-                    'userid'=>$result->userid,
-                    'skillname'=>$result->skillname))){
+
+            if(!$record = $DB->get_record('katest_results',(array)$result)){
                 $DB->insert_record('katest_results',$result);
             }
         }
@@ -79,7 +78,10 @@ echo $output->header();
     }
 
     if(!$results){
-        $results = $DB->get_records('katest_results',array('katestid'=>$katest->id,'userid'=>$USER->id));
+        $results = $DB->get_records('katest_results',array(
+            'katestid'=>$katest->id,
+            'userid'=>$USER->id,
+            'katestattempt'=>$attempt));
     }
     $grade = get_grade_data($results, $katest, $kaskills);
     $page = new \mod_katest\output\results($results, $grade);

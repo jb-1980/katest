@@ -110,39 +110,13 @@ if ($katest->intro) {
     echo $output->box(format_module_intro('katest', $katest, $cm->id), 'generalbox mod_introbox', 'katestintro');
 }
 
-
-
-if($katest->password) {
-    if(isset($SESSION->khanacademy_tokens)
-       && property_exists($SESSION->khanacademy_tokens,$katest_id)){
-        $page = new \mod_katest\output\index($katest);
-        echo $output->render($page);
-    } else {
-        $password = optional_param('password', null, PARAM_RAW);
-        if($password && data_submitted()){
-            if($password == $katest->password){
-                $page = new \mod_katest\output\khan_authenticate($id);
-                echo $output->render($page);
-            } else{
-                $msg = get_string('error_msg', 'katest');
-                $page = new \mod_katest\output\password($msg);
-                echo $output->render($page);
-            }
-        } else {
-            $page = new \mod_katest\output\password();
-            echo $output->render($page);
-        }
-    }
-} else {
-    if(isset($SESSION->khanacademy_tokens)
-       && property_exists($SESSION->khanacademy_tokens,$katest_id)){
-        $page = new \mod_katest\output\index($katest);
-        echo $output->render($page);
-    } else{
-        $page = new \mod_katest\output\khan_authenticate($id);
-        echo $output->render($page);
-    }
+if($katest->password && data_submitted()){ //data_submitted means POST request
+    $password = optional_param('password',null,PARAM_RAW);
+    $page = katest_choose_renderer($katest,$id,$password);
+    echo $output->render($page);
+} else{
+    $page = katest_choose_renderer($katest,$id);
+    echo $output->render($page);
 }
-
 // Finish the page.
 echo $output->footer();

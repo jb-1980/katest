@@ -39,9 +39,12 @@ use stdClass;
 class index implements renderable, templatable {
     /** @var $katest, the katest module */
     var $katest = null;
+    /** @var $attempt, the current attempt number */
+    var $attempt = null;
 
-    public function __construct($katest){
+    public function __construct($katest,$attempt){
       $this->katest = $katest;
+      $this->attempt= $attempt;
     }
     /**
      * Export this data so it can be used as the context for a mustache template.
@@ -49,11 +52,12 @@ class index implements renderable, templatable {
      * @return stdClass
      */
     public function export_for_template(renderer_base $output) {
-        global $DB;
+        global $DB, $CFG, $USER;
         $katest = $this->katest;
 
         $kaskills = $DB->get_records('katest_skills',array('katestid'=>$katest->id),'position');
 
+        echo 'The count is '.$this->attempt;
         $data = new stdClass();
         $data->questions = array();
         foreach($kaskills as $k=>$v){
@@ -64,6 +68,12 @@ class index implements renderable, templatable {
         $data->timestarted = time();
         $data->courseid = $katest->course;
         $data->katestid = $katest->id;
+        $data->katestattempt = $this->attempt + 1;
+        if($katest->attempts){
+          $data->exceededattempts = $data->katestattempt > $katest->attempts ? true : false;
+        }
+
+
         return $data;
     }
 }

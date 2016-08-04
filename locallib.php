@@ -28,6 +28,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once($CFG->dirroot.'/lib/grade/grade_item.php');
 require_once($CFG->libdir.'/oauthlib.php');
 
 class khan_oauth extends oauth_helper {
@@ -132,7 +133,7 @@ class khan_oauth extends oauth_helper {
  * @param stdClass $katest
  * @return string
  */
-function get_khan_results($katest, $kaskills, $timestarted, $timesubmitted){
+function get_khan_results($katest, $kaskills, $timestarted, $timesubmitted, $attempt){
     global $USER, $DB, $SESSION;
 
     // get data from Khan Academy and use to create a grade.
@@ -169,6 +170,8 @@ function get_khan_results($katest, $kaskills, $timestarted, $timesubmitted){
             $result = new stdClass;
             $result->katestid = $katest_id;
             $result->userid = $USER->id;
+            $result->katestattempt = $attempt;
+            $result->problemattempt = $key;
             $result->skillname = $skill->skillname;
             $result->hintused = $val->hint_used ? 1 : 0;
             $result->timetaken = $val->time_taken;
@@ -237,4 +240,50 @@ function get_grade_data($results, $katest, $kaskills){
     }
 
     return $finalgrade.'/'.$katest->grade;
+}
+
+
+function katest_choose_renderer($katest, $cid, $password=null){
+    global $CFG, $DB, $SESSION, $USER;
+
+    // Check to make sure number of attempts has not been exceeded
+    $attempts_sql = "SELECT COUNT(DISTINCT katestattempt)
+                       FROM {$CFG->prefix}katest_results
+                      WHERE userid = {$USER->id};";
+    $num_attempts = $DB->count_records_sql($attempts_sql);
+
+    // If attempts exceeded, return attempts_exceeded screen
+    if($katest->attempts && ($num_attempts + 1 > $katest->attempts)){
+        return new \mod_katest\output\attempts_exceeded();
+    }
+
+    // Everything has been authorized, so we can send them the index page
+    if(isset($SESSION->khanacademy_tokens)
+         && property_exists($SESSION->khanacademy_tokens,$katest->id)){
+        // All authentication has be passed, we can start the test
+        return new \mod_katest\output\index($katest,$num_attempts);
+    }
+
+    /** Authorization
+     *  If a password is required, we will check that is is correct and then
+     *  move to Khan Authorization page. Otherwise, we will just go straight
+     *  the Khan Authorization page.
+     */
+    if($katest->password) { // Authenticate password if required
+        if($password){
+          if($password == $katest->password){
+              // password is correct, now let's make sure that we can sync up with khan
+              return new \mod_katest\output\khan_authenticate($cid);
+          } else{ // incorrect password
+              $msg = get_string('error_msg', 'katest');
+              return new \mod_katest\output\password($msg);
+          }
+        } else{ //password has not been submitted, send password page
+          return new \mod_katest\output\password();
+        }
+    } else{ // no password required, so let's just get Khan Authorization
+        return new \mod_katest\output\khan_authenticate($cid);
+    }
+    // Something was missed. This should raise an error
+    return null;
 }

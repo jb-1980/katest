@@ -103,5 +103,30 @@ function xmldb_katest_upgrade($oldversion) {
         // Katest savepoint reached.
         upgrade_mod_savepoint(true, 2016080300, 'katest');
     }
+
+    if ($oldversion < 2016080400) {
+
+        // Define table katest to be updated.
+        $katest = new xmldb_table('katest_results');
+
+        // Adding fields to table katest.
+        $attempts = new xmldb_field('katestattempt', XMLDB_TYPE_INTEGER, '10', null, null,null,null);
+
+        // Conditionally launch add field.
+        if (!$dbman->field_exists($katest, $attempts)) {
+            $dbman->add_field($katest, $attempts);
+        }
+
+        // Adding fields to table katest.
+        $skillattempts = new xmldb_field('problemattempt', XMLDB_TYPE_INTEGER, '10', null, null,null,null);
+
+        // Conditionally launch add field.
+        if (!$dbman->field_exists($katest, $skillattempts)) {
+            $dbman->add_field($katest, $skillattempts);
+        }
+
+        // Katest savepoint reached.
+        upgrade_mod_savepoint(true, 2016080400, 'katest');
+    }
     return true;
 }
