@@ -50,7 +50,7 @@ class backup_katest_activity_structure_step extends backup_activity_structure_st
             'name', 'intro', 'introformat', 'grade'));
 
         // If we had more elements, we would build the tree here.
-        $kaskills = new backup_nested_element('katest_skills', array('id'))
+        $kaskills = new backup_nested_element('katest_skills', array('id'));
         // Define data sources.
         $katest->set_source_table('katest', array('id' => backup::VAR_ACTIVITYID));
 
