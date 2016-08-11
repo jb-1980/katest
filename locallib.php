@@ -222,7 +222,7 @@ function get_grade_data($results, $katest, $kaskills){
                 $num++;
                 break;
             case count($grade) == 2:
-                $num += 0.8;
+                $num += 0.75;
                 break;
             case count($grade) == 3:
                 $num += 0.5;
@@ -230,7 +230,7 @@ function get_grade_data($results, $katest, $kaskills){
     }
     $finalgrade = $total ? $num/$total*$katest->grade : null;
 
-    return $finalgrade.'/'.$katest->grade;
+    return $finalgrade;
 }
 
 function katest_update_grade($courseid, $katestid, $userid, $grade){

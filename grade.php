@@ -32,6 +32,8 @@ $timestarted  = optional_param('timestarted', 0,PARAM_INT);
 $timesubmitted = optional_param('timesubmitted', 0,PARAM_INT);
 $attempt = optional_param('attempt',0,PARAM_INT);
 
+$katest = $DB->get_record('katest', array('id' => $k), '*', MUST_EXIST);
+$kaskills = $DB->get_records('katest_skills',array('katestid'=>$katest->id));
 
 if($timestarted && $timesubmitted && data_submitted()){
     $timestarted = gmdate('Y-m-d\TH:i:s\Z',$timestarted);
@@ -46,11 +48,10 @@ if($timestarted && $timesubmitted && data_submitted()){
     }
     $transaction->allow_commit();
 }
-$katest = $DB->get_record('katest', array('id' => $k), '*', MUST_EXIST);
-$kaskills = $DB->get_records('katest_skills',array('katestid'=>$katest->id));
 
-$grade = get_grade_data($results, $katest, $kaskills)
-katest_update_grade($id, $k, $userid, $grade)
+
+$grade = get_grade_data($results, $katest, $kaskills);
+katest_update_grade($id, $k, $USER->id, $grade);
 
 // In the simplest case just redirect to the view page.
 redirect('results.php?user='.$USER->id.'&k='.$k.'&id='.$id);
