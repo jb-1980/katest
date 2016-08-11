@@ -63,11 +63,11 @@ class results_admin implements renderable, templatable {
           "modid"    =>$this->modid,
           "cmid"     =>$this->cmid
         );
+        
         foreach($this->grades as $userid=>$user){
-
-          $user->id = $userid;
           $data["grades"][] = $user;
         }
+
         return $data;
     }
 }

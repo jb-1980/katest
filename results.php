@@ -64,7 +64,7 @@ if(has_capability('mod/katest:viewreports', $PAGE->context)){
             $user_data->id = $key;
             $user_data->name = $users[$key]->firstname.' '.$users[$key]->lastname;
             $user_data->grade = $grade->grade;
-            $grades[$k] = $user_data;
+            $grades[$key] = $user_data;
           }
       }
 

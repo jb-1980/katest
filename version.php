@@ -28,7 +28,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_katest';
-$plugin->version = 2016080400;
+$plugin->version = 2016081100;
 $plugin->release = 'v0.0.2';
 $plugin->requires = 2015051101;
 $plugin->maturity = MATURITY_ALPHA;
