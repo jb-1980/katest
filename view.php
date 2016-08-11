@@ -32,6 +32,7 @@ require_once(dirname(__FILE__).'/locallib.php');
 
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID, or
 $k  = optional_param('k', 0, PARAM_INT);  // katest instance ID
+$preview = optional_param('preview',0,PARAM_INT); // bool to allow admin to preview quiz
 
 // tokens returned from authenticating with KA
 $oauth_token = optional_param('oauth_token',null,PARAM_RAW);
@@ -77,6 +78,11 @@ if($oauth_token and $oauth_token_secret and $oauth_verifier){
 
 require_login($course, true, $cm);
 
+if(has_capability('mod/katest:viewreports', $PAGE->context) && $preview == 0){
+    redirect('results.php?user=0&k='.$katest->id.'&id='.$course->id);
+}
+
+
 $event = \mod_katest\event\course_module_viewed::create(array(
     'objectid' => $PAGE->cm->instance,
     'context' => $PAGE->context,
@@ -92,6 +98,7 @@ $event->trigger();
 $PAGE->set_url('/mod/katest/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($katest->name));
 $PAGE->set_heading(format_string($course->fullname));
+
 
 /*
  * Other things you may want to set - remove if not needed.

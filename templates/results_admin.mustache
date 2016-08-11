@@ -1,0 +1,23 @@
+<div data-region="katest-results">
+  <div style="text-align:center;margin-bottom:25px;">
+    <a class="btn btn-primary" href="view.php?id={{cmid}}&preview=1"/>Preview Quiz</a>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Grade</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#grades}}
+      <tr>
+        <th>
+          <a href="results.php?user={{id}}&k={{modid}}&id={{courseid}}">{{name}}</a>
+        </th>
+        <th>{{grade}}</th>
+      </tr>
+      {{/grades}}
+    </tbody>
+  </table>
+</div>

@@ -32,9 +32,8 @@ require_once(dirname(__FILE__).'/locallib.php');
 
 $id = required_param('id', PARAM_INT); // Course ID, or
 $k  = required_param('k', PARAM_INT);  // katest instance ID
-$timestarted  = optional_param('timestarted', 0,PARAM_INT);
-$timesubmitted = optional_param('timesubmitted', 0,PARAM_INT);
-$attempt = optional_param('attempt',0,PARAM_INT);
+$user = optional_param('user',0,PARAM_INT); // user results, 0 is all users
+$attempt = optional_param('attempt',0,PARAM_INT); // user attempt, 0 is all attempts
 
 $katest = $DB->get_record('katest', array('id' => $k), '*', MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $katest->course), '*', MUST_EXIST);
@@ -54,38 +53,42 @@ $PAGE->set_heading(format_string($course->fullname));
 $output = $PAGE->get_renderer('mod_katest');
 echo $output->header();
 
-#if(has_capability('mod/katest:viewreports', $PAGE->context)){
-#    echo 'Grade reports coming soon';
+if(has_capability('mod/katest:viewreports', $PAGE->context)){
+    if($user === 0){
+      $users = get_enrolled_users($PAGE->context);
+      $grading_info = grade_get_grades($id, 'mod', 'katest', $k, array_keys($users));
+      $grades = array();
+      foreach($grading_info->items[0]->grades as $key=> $grade){
+          if($grade->grade){
+            $user_data = new stdClass;
+            $user_data->id = $key;
+            $user_data->name = $users[$key]->firstname.' '.$users[$key]->lastname;
+            $user_data->grade = $grade->grade;
+            $grades[$k] = $user_data;
+          }
+      }
 
-#} else{
+      $page = new \mod_katest\output\results_admin($grades, $id, $k, $cm->id);
+      echo $output->render($page);
+
+    } else{
+      $user_record = $DB->get_record('user',array('id'=>$user));
+      echo $output->heading($katest->name.' results for '.$user_record->firstname.' '.$user_record->lastname);
+
+      $results = $DB->get_records('katest_results',array('katestid'=>$k,'userid'=>$user));
+      $page = new \mod_katest\output\results($results, $katest, $kaskills);
+      echo $output->render($page);
+    }
+
+} else{
 
 
     echo $output->heading($katest->name.' results for '.$USER->firstname.' '.$USER->lastname);
 
-    $results = null;
-    if($timestarted && $timesubmitted){
-        $timestarted = gmdate('Y-m-d\TH:i:s\Z',$timestarted);
-        $timesubmitted = gmdate('Y-m-d\TH:i:s\Z',$timesubmitted);
-        $results = get_khan_results($katest, $kaskills, $timestarted, $timesubmitted,$attempt);
-        $transaction = $DB->start_delegated_transaction();
-        foreach($results as $skillname=>$result){
-
-            if(!$record = $DB->get_record('katest_results',(array)$result)){
-                $DB->insert_record('katest_results',$result);
-            }
-        }
-        $transaction->allow_commit();
-    }
-
-    if(!$results){
-        $results = $DB->get_records('katest_results',array(
-            'katestid'=>$katest->id,
-            'userid'=>$USER->id,
-            'katestattempt'=>$attempt));
-    }
-    $grade = get_grade_data($results, $katest, $kaskills);
-    $page = new \mod_katest\output\results($results, $grade);
+    $results = $DB->get_records('katest_results',array('katestid'=>$k,'userid'=>$USER->id));
+    //$grade = get_grade_data($results, $katest, $kaskills);
+    $page = new \mod_katest\output\results($results, $katest, $kaskills);
     echo $output->render($page);
-//}
+}
 // Finish the page.
 echo $output->footer();

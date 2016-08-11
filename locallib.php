@@ -230,18 +230,17 @@ function get_grade_data($results, $katest, $kaskills){
     }
     $finalgrade = $total ? $num/$total*$katest->grade : null;
 
-    global $USER;
-    if($finalgrade){
-        $gradeitem = new grade_item(array(
-            'courseid'=>$katest->course,
-            'itemmodule'=>'katest',
-            'iteminstance'=>$katest->id));
-        $gradeitem->update_raw_grade($USER->id, $finalgrade);
-    }
-
     return $finalgrade.'/'.$katest->grade;
 }
 
+function katest_update_grade($courseid, $katestid, $userid, $grade){
+  $gradeitem = new grade_item(array(
+          'courseid'=>$courseid,
+          'itemmodule'=>'katest',
+          'iteminstance'=>$katestid));
+  $gradeitem->update_raw_grade($userid, $grade);
+  return $grade;
+}
 
 function katest_choose_renderer($katest, $cid, $password=null){
     global $CFG, $DB, $SESSION, $USER;

@@ -37,20 +37,19 @@ use stdClass;
  * @copyright  2016 Joseph Gilgen <gilgenlabs@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class results implements renderable, templatable {
-    /** @var $results, the results data from Khan Academy */
-    var $results = null;
+class results_admin implements renderable, templatable {
+    /** @var $grades, the grades for the Khan Academy test */
+    var $grades = null;
 
-    /** @var $katest, katest record object */
-    var $katest = null;
+    var $courseid = null;
+    var $modid = null;
+    var $cmid = null;
 
-    /** @var $kaskills, skills object related to katest */
-    var $kaskills = null;
-
-    public function __construct($results, $katest, $kaskills){
-      $this->results = $results;
-      $this->katest = $katest;
-      $this->kaskills = $kaskills;
+    public function __construct($grades, $courseid, $modid, $cmid){
+      $this->grades = $grades;
+      $this->courseid = $courseid;
+      $this->modid = $modid;
+      $this->cmid = $cmid;
     }
     /**
      * Export this data so it can be used as the context for a mustache template.
@@ -58,22 +57,17 @@ class results implements renderable, templatable {
      * @return stdClass
      */
     public function export_for_template(renderer_base $output) {
-        $attempts = array();
-        foreach($this->results as $k=>$result){
-            $result->skillname = explode('~',$result->skillname)[1];
-            $attempts[$result->katestattempt]['results'][] = $result;
+        $data = array(
+          "grades"   =>array(),
+          "courseid" =>$this->courseid,
+          "modid"    =>$this->modid,
+          "cmid"     =>$this->cmid
+        );
+        foreach($this->grades as $userid=>$user){
+
+          $user->id = $userid;
+          $data["grades"][] = $user;
         }
-
-
-
-        $data = new stdClass;
-        $data->attempts = array();
-        foreach($attempts as $k=>$attempt){
-            $attempt['grade'] = get_grade_data($attempt['results'], $this->katest, $this->kaskills);
-
-            $data->attempts[] = $attempt;
-        }
-        
         return $data;
     }
 }
