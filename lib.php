@@ -31,10 +31,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * Example constant, you probably want to remove this :-)
- */
-define('KATEST_ULTIMATE_ANSWER', 42);
 
 /* Moodle core API */
 
@@ -248,7 +244,7 @@ function katest_print_recent_mod_activity($activity, $courseid, $detail, $modnam
  * @return boolean
  */
 function katest_cron () {
-    return true;
+    return false;
 }
 
 /**
@@ -359,14 +355,25 @@ function katest_grade_item_delete($katest) {
  * Needed by {@link grade_update_mod_grades()}.
  *
  * @param stdClass $katest instance object with extra cmidnumber and modname property
+ * @param stdClass $results results array from an attempt in the katest_results table
  * @param int $userid update grade of specific user only, 0 means all participants
  */
-function katest_update_grades(stdClass $katest, $userid = 0) {
+function katest_update_grades(stdClass $katest, $results,$userid = 0) {
     global $CFG, $DB;
     require_once($CFG->libdir.'/gradelib.php');
+    require_once(__DIR__.'/locallib.php');
 
-    // Populate array of grade objects indexed by userid.
-    $grades = array();
+    if($userid){
+      // Get list of skills on quiz
+      $kaskills = $DB->get_records('katest_skills',array('katestid'=>$katest->id));
+      $grade = katest_calculate_grade($results, $katest, $kaskills);
+      $user = new stdClass;
+      $user->userid = $userid;
+      $user->rawgrade = $grade;
+      $grades = array($userid=>$user);
+    } else{
+      $grades = array();
+    }
 
     grade_update('mod/katest', $katest->course, 'mod', 'katest', $katest->id, 0, $grades);
 }
@@ -433,33 +440,4 @@ function katest_pluginfile($course, $cm, $context, $filearea, array $args, $forc
     require_login($course, true, $cm);
 
     send_file_not_found();
-}
-
-/* Navigation API */
-
-/**
- * Extends the global navigation tree by adding katest nodes if there is a relevant content
- *
- * This can be called by an AJAX request so do not rely on $PAGE as it might not be set up properly.
- *
- * @param navigation_node $navref An object representing the navigation tree node of the katest module instance
- * @param stdClass $course current course record
- * @param stdClass $module current katest instance record
- * @param cm_info $cm course module information
- */
-function katest_extend_navigation(navigation_node $navref, stdClass $course, stdClass $module, cm_info $cm) {
-    // TODO Delete this function and its docblock, or implement it.
-}
-
-/**
- * Extends the settings navigation with the katest settings
- *
- * This function is called when the context for the page is a katest module. This is not called by AJAX
- * so it is safe to rely on the $PAGE.
- *
- * @param settings_navigation $settingsnav complete settings navigation tree
- * @param navigation_node $katestnode katest administration node
- */
-function katest_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $katestnode=null) {
-    // TODO Delete this function and its docblock, or implement it.
 }

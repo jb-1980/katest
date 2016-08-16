@@ -33,12 +33,12 @@ $functions = array(
         'capabilities'=> '',
     ),
 
-    'mod_katest_check_password' => array(
+    'mod_katest_delete_attempt' => array(
         'classname'   => 'mod_katest\external',
-        'methodname'  => 'check_password',
+        'methodname'  => 'delete_attempt',
         'classpath'   => '',
-        'description' => 'Authenticates for a test that has an assigned password',
-        'type'        => 'read',
-        'capabilities'=> '',
+        'description' => 'Delete a test attempt',
+        'type'        => 'write',
+        'capabilities'=> 'mod/katest:viewreports',
     )
 );

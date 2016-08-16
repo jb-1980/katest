@@ -28,7 +28,7 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-$id = optional_param('id', 0, PARAM_INT);
+$cmid = optional_param('id', 0, PARAM_INT);
 
 $consumer_obj = get_config('katest');
 $args = array(
@@ -37,7 +37,7 @@ $args = array(
     'oauth_consumer_secret'=>$consumer_obj->consumer_secret,
     'request_token_api'=>'http://www.khanacademy.org/api/auth/request_token',
     'access_token_api'=>'http://www.khanacademy.org/api/auth/access_token',
-    'oauth_callback'=>"{$CFG->wwwroot}/mod/katest/view.php?id={$id}"
+    'oauth_callback'=>"{$CFG->wwwroot}/mod/katest/view.php?id={$cmid}"
 );
 $khanacademy = new khan_oauth($args);
 $khanacademy->request_token();

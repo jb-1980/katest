@@ -47,10 +47,11 @@ class results implements renderable, templatable {
     /** @var $kaskills, skills object related to katest */
     var $kaskills = null;
 
-    public function __construct($results, $katest, $kaskills){
+    public function __construct($results, $katest, $kaskills, $is_admin=false){
       $this->results = $results;
       $this->katest = $katest;
       $this->kaskills = $kaskills;
+      $this->is_admin = $is_admin;
     }
     /**
      * Export this data so it can be used as the context for a mustache template.
@@ -59,7 +60,11 @@ class results implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output) {
         $attempts = array();
-        foreach($this->results as $k=>$result){
+        $expected_attempts = array();
+        foreach($this->kaskills as $key=>$kaskill){
+          $expected_attempts[explode('~',$kaskill->skillname)[1]] = 1;
+        }
+        foreach($this->results as $key=>$result){
             $result->skillname = explode('~',$result->skillname)[1];
             $attempts[$result->katestattempt]['results'][] = $result;
         }
@@ -68,12 +73,22 @@ class results implements renderable, templatable {
 
         $data = new stdClass;
         $data->attempts = array();
+        $data->is_admin = $this->is_admin;
+        $data->katestid = $this->katest->id;
+        $data->userid = array_shift($this->results)->userid;
         foreach($attempts as $k=>$attempt){
-            $attempt['grade'] = get_grade_data($attempt['results'], $this->katest, $this->kaskills);
-
+            $unattempted = $expected_attempts;
+            foreach($attempt['results'] as $key=>$result){
+              unset($unattempted[$result->skillname]);
+            }
+            $attempt['grade'] = katest_calculate_grade($attempt['results'], $this->katest, $this->kaskills);
+            $attempt['number'] = $k;
+            foreach($unattempted as $skillname=>$v){
+                $attempt['unattempted'][] = array("skillname"=>$skillname);
+            }
             $data->attempts[] = $attempt;
         }
-        
+
         return $data;
     }
 }

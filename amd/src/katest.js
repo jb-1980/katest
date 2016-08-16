@@ -24,7 +24,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      2.9
  */
-define(['jquery'], function($) {
+define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notification) {
     return /** @alias module:mod_katest/katest */ {
 
         setButtions: function(){
@@ -38,6 +38,34 @@ define(['jquery'], function($) {
             var time = Math.floor(Date.now() / 1000);
             $("input[name='timesubmitted']").val(time);
             $("#katest-get-results-form").submit();
+          });
+        },
+
+        deleteAttempt: function(){
+          $('.katest-delete-attempt').click(function() {
+            var $this = $(this);
+            var userid = $this.data('userid');
+            var katestid = $this.data('katestid');
+            var attemptid = $this.data('attemptid');
+
+            // First - reload the data for the page.
+            var promises = ajax.call([{
+                methodname: 'mod_katest_delete_attempt',
+                args:{
+                  userid:userid,
+                  katestid:katestid,
+                  attemptid:attemptid
+                }
+            }]);
+            promises[0].done(function() {
+              var $html = $('<div class="katest-attempt-delete-message">Attempt was deleted.</div>');
+              $('#katest-attempt-'+attemptid).replaceWith($html);
+              setTimeout(function(){
+                $html.fadeOut(400);
+              }, 500);
+
+            }).fail(notification.exception);
+
           });
         }
     };

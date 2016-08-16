@@ -25,7 +25,7 @@ namespace mod_katest;
 
 require_once("$CFG->libdir/externallib.php");
 require_once("$CFG->dirroot/webservice/externallib.php");
-require_once("../../locallib.php");
+require_once(dirname(dirname(__FILE__)).'/locallib.php');
 
 use external_api;
 use external_function_parameters;
@@ -44,16 +44,16 @@ use invalid_parameter_exception;
 class external extends external_api {
 
     /**
-     * Parameters for post_grade function
+     * Parameters for delete_attempt function
      *
      * @return external_function_parameters
      */
-    public static function post_grade_parameters() {
+    public static function delete_attempt_parameters() {
         return new external_function_parameters(
             array(
               'userid' => new external_value(PARAM_INT, 'some user id'),
               'katestid' => new external_value(PARAM_INT, 'the katest module id'),
-              'timesubmitted' => new external_value(PARAM_INT, 'UTC Unix timestamp')
+              'attemptid' => new external_value(PARAM_INT, 'the attempt number')
             )
         );
     }
@@ -62,49 +62,27 @@ class external extends external_api {
      * Expose to AJAX
      * @return boolean
      */
-    public static function post_grade_is_allowed_from_ajax() {
+    public static function delete_attempt_is_allowed_from_ajax() {
         return true;
     }
 
     /**
      * Collect data from Khan Academy using their API, and post a grade.
      */
-    public static function post_grade($userid,$katestid,$timesubmitted) {
+    public static function delete_attempt($userid,$katestid,$attemptid) {
         global $DB;
 
-        $params = self::validate_parameters(self:post_grade_parameters(),
-            array('userid' => $userid,
+        $params = self::validate_parameters(self::delete_attempt_parameters(),
+            array('userid'   => $userid,
                   'katestid' => $katestid,
-                  'timesubmitted'=> $timesubmitted));
+                  'attemptid'=> $attemptid));
 
-        // get user object from database to update grades for
-        $user = $DB->get_record('user',array('id',$params['userid']));
-
-        // get data from Khan Academy and use to create a grade.
-
-        // 1. Create khan academy auth object
-        $consumer_obj = get_config('katest');
-        $args = array(
-            'api_root'=>'http://www.khanacademy.org/',
-            'oauth_consumer_key'=>$consumer_obj->consumer_key,
-            'oauth_consumer_secret'=>$consumer_obj->consumer_secret,
-            'request_token_api'=>'http://www.khanacademy.org/api/auth/request_token',
-            'access_token_api'=>'http://www.khanacademy.org/api/auth/access_token',
-            'oauth_callback'=>"{$CFG->wwwroot}/mod/katest/view.php?id={$id}"
-        );
-        $khanacademy = new khan_oauth($args);
-
-        // 2. Get list of skills on quiz
-        $kaskills = $DB->get_records('katest_skills',array('katestid'=>$params->katestid));
-
-        // 3. Get data for each skill
-        $url = 'https://www.khanacadey.org/api/v2/user/'
-        $tokens = $SESSION->
-        foreach($kaskills as $k=>$skill){
-
-        }
-
-        $response = $khanacademy->request('GET', $url, $params = array(), $token = '', $secret = '')
+        debugging(print_r($params,true));
+        $DB->delete_records('katest_results', array(
+            'userid'      => $params['userid'],
+            'katestid'    => $params['katestid'],
+            'katestattempt'=> $params['attemptid']
+          ));
     }
 
     /**
@@ -112,7 +90,7 @@ class external extends external_api {
      *
      * @return external_description
      */
-    public static function post_grade_returns() {
+    public static function delete_attempt_returns() {
         return null;
     }
 }

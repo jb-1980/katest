@@ -33,6 +33,21 @@
   opacity: 0.5;
 }
 
+.katest-delete-attempt{
+  cursor: pointer;
+  color: #f00;
+  font-size: 0.5em;
+  text-decoration: underline;
+  float: right;
+}
+
+.katest-attempt-delete-message{
+  font-size: 0.75em;
+  color: #f00;
+  margin: auto;
+  font-weight: bold;
+}
+
 /*!
 Chosen, a Select Box Enhancer for jQuery and Prototype
 by Patrick Filler for Harvest, http://getharvest.com

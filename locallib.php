@@ -193,7 +193,7 @@ function get_khan_results($katest, $kaskills, $timestarted, $timesubmitted, $att
  * @param stdClass $kaskills, the kaskills object
  * @return float
  */
-function get_grade_data($results, $katest, $kaskills){
+function katest_calculate_grade($results, $katest, $kaskills){
     $total = count($kaskills);
 
     $grades = array();
@@ -206,27 +206,35 @@ function get_grade_data($results, $katest, $kaskills){
     }
 
     $num = 0;
+    $marks = array(
+      1=>1.0,
+      2=>0.75,
+      3=>0.5
+    );
     foreach($grades as $k=>$grade){
-        $correct = false;
+        $count = 1;
         foreach($grade as $key=> $g){
             if($g->correct){
-                $correct = true;
+                $num += $marks[$count];
+                break;
+            } elseif($count==3){
                 break;
             }
+            $count++;
         }
 
-        switch (true) {
-            case !$correct:
-                break;
-            case count($grade) == 1:
-                $num++;
-                break;
-            case count($grade) == 2:
-                $num += 0.75;
-                break;
-            case count($grade) == 3:
-                $num += 0.5;
-        }
+        // switch (true) {
+        //     case !$correct:
+        //         break;
+        //     case count($grade) == 1:
+        //         $num++;
+        //         break;
+        //     case count($grade) == 2:
+        //         $num += 0.75;
+        //         break;
+        //     case count($grade) == 3:
+        //         $num += 0.5;
+        // }
     }
     $finalgrade = $total ? $num/$total*$katest->grade : null;
 
@@ -238,21 +246,22 @@ function katest_update_grade($courseid, $katestid, $userid, $grade){
           'courseid'=>$courseid,
           'itemmodule'=>'katest',
           'iteminstance'=>$katestid));
-  $gradeitem->update_raw_grade($userid, $grade);
   return $grade;
 }
 
-function katest_choose_renderer($katest, $cid, $password=null){
+function katest_choose_renderer($katest, $cmid, $password=null){
     global $CFG, $DB, $SESSION, $USER;
 
     // Check to make sure number of attempts has not been exceeded
     $attempts_sql = "SELECT COUNT(DISTINCT katestattempt)
                        FROM {$CFG->prefix}katest_results
-                      WHERE userid = {$USER->id};";
+                      WHERE userid = {$USER->id}
+                            AND katestid = {$katest->id};";
     $num_attempts = $DB->count_records_sql($attempts_sql);
 
     // If attempts exceeded, return attempts_exceeded screen
     if($katest->attempts && ($num_attempts + 1 > $katest->attempts)){
+        print_object(array($num_attempts,$katest->attempts));
         return new \mod_katest\output\attempts_exceeded();
     }
 
@@ -260,7 +269,7 @@ function katest_choose_renderer($katest, $cid, $password=null){
     if(isset($SESSION->khanacademy_tokens)
          && property_exists($SESSION->khanacademy_tokens,$katest->id)){
         // All authentication has be passed, we can start the test
-        return new \mod_katest\output\index($katest,$num_attempts);
+        return new \mod_katest\output\index($katest,$num_attempts,$cmid);
     }
 
     /** Authorization
@@ -272,7 +281,7 @@ function katest_choose_renderer($katest, $cid, $password=null){
         if($password){
           if($password == $katest->password){
               // password is correct, now let's make sure that we can sync up with khan
-              return new \mod_katest\output\khan_authenticate($cid);
+              return new \mod_katest\output\khan_authenticate($cmid);
           } else{ // incorrect password
               $msg = get_string('error_msg', 'katest');
               return new \mod_katest\output\password($msg);
@@ -281,7 +290,7 @@ function katest_choose_renderer($katest, $cid, $password=null){
           return new \mod_katest\output\password();
         }
     } else{ // no password required, so let's just get Khan Authorization
-        return new \mod_katest\output\khan_authenticate($cid);
+        return new \mod_katest\output\khan_authenticate($cmid);
     }
     // Something was missed. This should raise an error
     return null;

@@ -38,11 +38,11 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class khan_authenticate implements renderable, templatable {
-    /** @var $id, the course id */
-    var $id = null;
+    /** @var $cmid, the course module id */
+    var $cmid = null;
 
-    public function __construct($id){
-      $this->id = $id;
+    public function __construct($cmid){
+      $this->cmid = $cmid;
     }
     /**
      * Export this data so it can be used as the context for a mustache template.
@@ -51,7 +51,7 @@ class khan_authenticate implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output) {
         $data = new stdClass;
-        $data->id = $this->id;
+        $data->cmid = $this->cmid;
         return $data;
     }
 }

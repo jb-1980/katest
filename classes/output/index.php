@@ -41,10 +41,13 @@ class index implements renderable, templatable {
     var $katest = null;
     /** @var $attempt, the current attempt number */
     var $attempt = null;
+    /** @var $cmid, the course module id for the katest */
+    var $cmid = null;
 
-    public function __construct($katest,$attempt){
+    public function __construct($katest,$attempt,$cmid){
       $this->katest = $katest;
       $this->attempt= $attempt;
+      $this->cmid   = $cmid;
     }
     /**
      * Export this data so it can be used as the context for a mustache template.
@@ -65,7 +68,7 @@ class index implements renderable, templatable {
             $data->questions[] = $v;
         }
         $data->timestarted = time();
-        $data->courseid = $katest->course;
+        $data->cmid = $this->cmid;
         $data->katestid = $katest->id;
         $data->katestattempt = $this->attempt + 1;
         if($katest->attempts){

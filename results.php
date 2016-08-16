@@ -54,6 +54,7 @@ $output = $PAGE->get_renderer('mod_katest');
 echo $output->header();
 
 if(has_capability('mod/katest:viewreports', $PAGE->context)){
+    $is_admin = true;
     if($user === 0){
       $users = get_enrolled_users($PAGE->context);
       $grading_info = grade_get_grades($id, 'mod', 'katest', $k, array_keys($users));
@@ -76,7 +77,7 @@ if(has_capability('mod/katest:viewreports', $PAGE->context)){
       echo $output->heading($katest->name.' results for '.$user_record->firstname.' '.$user_record->lastname);
 
       $results = $DB->get_records('katest_results',array('katestid'=>$k,'userid'=>$user));
-      $page = new \mod_katest\output\results($results, $katest, $kaskills);
+      $page = new \mod_katest\output\results($results, $katest, $kaskills, $is_admin);
       echo $output->render($page);
     }
 

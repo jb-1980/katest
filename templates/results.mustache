@@ -1,23 +1,48 @@
 <div data-region="katest-results">
   {{#attempts}}
-  <h4>Quiz Grade: {{grade}}</h4>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Skill Name</th>
-        <th>correct</th>
-        <th>time taken</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#results}}
-      <tr>
-        <th>{{skillname}}</th>
-        <th>{{correct}}</th>
-        <th>{{timetaken}}</th>
-      </tr>
-      {{/results}}
-    </tbody>
-  </table>
+  <div id="katest-attempt-{{number}}">
+    <h4>
+      Attempt {{number}}
+      {{#is_admin}}
+      <span
+        class="katest-delete-attempt"
+
+        data-katestid="{{katestid}}"
+        data-attemptid="{{number}}"
+        data-userid="{{userid}}">
+        delete this attempt
+      </span>
+      {{/is_admin}}
+    </h4>
+    <h5>Quiz Grade: {{grade}}</h5>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Skill Name</th>
+          <th>correct</th>
+          <th>time taken</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#results}}
+        <tr>
+          <th>{{skillname}}</th>
+          <th>{{correct}}</th>
+          <th>{{timetaken}}</th>
+        </tr>
+        {{/results}}
+        {{#unattempted}}
+        <tr>
+          <th colspan="3">{{skillname}} has no data.</th>
+        </tr>
+        {{/unattempted}}
+      </tbody>
+    </table>
+  </div>
   {{/attempts}}
 </div>
+{{#js}}
+    require(['mod_katest/katest'], function(katest) {
+        katest.deleteAttempt();
+    });
+{{/js}}
