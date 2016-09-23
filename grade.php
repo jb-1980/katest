@@ -51,7 +51,7 @@ if ($id) {
 $kaskills = $DB->get_records('katest_skills',array('katestid'=>$katest->id));
 if($timestarted && $timesubmitted && data_submitted()){
     $timestarted = gmdate('Y-m-d\TH:i:s\Z',$timestarted);
-    $timesubmitted = gmdate('Y-m-d\TH:i:s\Z',$timesubmitted+30);
+    $timesubmitted = gmdate('Y-m-d\TH:i:s\Z',time()+30);
     $results = get_khan_results($katest, $kaskills, $timestarted, $timesubmitted,$attempt);
     $transaction = $DB->start_delegated_transaction();
     foreach($results as $skillname=>$result){

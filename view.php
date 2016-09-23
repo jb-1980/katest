@@ -65,7 +65,7 @@ if($oauth_token and $oauth_token_secret and $oauth_verifier){
         'access_token_api'=>'http://www.khanacademy.org/api/auth/access_token',
         'oauth_callback'=>"{$CFG->wwwroot}/mod/katest/view.php?id={$id}"
     );
-    $khanacademy = new khan_oauth($args);
+    $khanacademy = new katest_oauth($args);
     $tokens = $khanacademy->get_access_token($oauth_token,$oauth_token_secret,$oauth_verifier);
     if(isset($SESSION->khanacademy_tokens)){
         $SESSION->khanacademy_tokens->$katest_id = $tokens;

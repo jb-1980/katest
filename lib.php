@@ -110,13 +110,24 @@ function katest_update_instance(stdClass $katest, mod_katest_mod_form $mform = n
     $result = $DB->update_record('katest', $katest);
     if($katest->id){
         foreach ($katest->skillname as $key => $val){
-            if($val){
+            $skill_id = $katest->skillid[$key];
+            if($skill_id){
+              if($val){
                 $skill = new stdClass;
                 $skill->id = $katest->skillid[$key];
                 $skill->katestid = $katest->id;
                 $skill->skillname = $val;
                 $skill->position = $key;
                 $DB->update_record('katest_skills', $skill);
+              } else {
+                $DB->delete_records('katest_skills', array('id'=>$skill_id));
+              }
+            } else if($val){
+              $skill = new stdClass;
+              $skill->katestid = $katest->id;
+              $skill->skillname = $val;
+              $skill->position = $key;
+              $DB->insert_record('katest_skills', $skill);
             }
         }
     }

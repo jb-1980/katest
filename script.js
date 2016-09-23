@@ -8,4 +8,7 @@ $('.katest-submit-button').click(function() {
   alert('Thanks for submitting your test. Your data is being collected from Khan Academy and a grade shall be issued shortly.\n'+timeString)
 });
 
-$(".katest-chosen-select").chosen({width:'250px'});
+$(".katest-chosen-select").chosen({
+  width:'250px',
+  allow_single_deselect: true
+});

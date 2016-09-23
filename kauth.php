@@ -39,5 +39,5 @@ $args = array(
     'access_token_api'=>'http://www.khanacademy.org/api/auth/access_token',
     'oauth_callback'=>"{$CFG->wwwroot}/mod/katest/view.php?id={$cmid}"
 );
-$khanacademy = new khan_oauth($args);
+$khanacademy = new katest_oauth($args);
 $khanacademy->request_token();

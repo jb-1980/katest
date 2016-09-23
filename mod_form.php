@@ -78,11 +78,11 @@ class mod_katest_mod_form extends moodleform_mod {
         // limited to math skills. Also, as an internal api it is not documented
         // and could be changed without notice. User beware!!
         // TODO: Make an admin setting to use this url or the given url of
-        // https://www.khanacademy.org/api/v1/exercises as the expense of speed
+        // https://www.khanacademy.org/api/v1/exercises at the expense of speed
         $skills_url = 'https://www.khanacademy.org/api/internal/exercises/math_topics_and_exercises';
         $json = file_get_contents($skills_url);
         $skill_data = json_decode($json)->exercises;
-        $skill_select[] = '';
+        $skill_select[] = ' ';
         foreach($skill_data as $skill=>$data){
               $skill_select[$data->name.'~'.$data->display_name]=$data->display_name;
         }
@@ -94,7 +94,7 @@ class mod_katest_mod_form extends moodleform_mod {
             get_string('question', 'katest').' {no}',
             $skill_select,
             array('height'=>'64px','overflow'=>'hidden','width'=>'240px',
-            'class'=>'katest-chosen-select')
+            'class'=>'katest-chosen-select chosen-select-deselect')
         );
         $repeatarray[] = $mform->createElement('hidden', 'skillid',null);
 

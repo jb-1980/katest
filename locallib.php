@@ -31,7 +31,7 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->libdir.'/oauthlib.php');
 
-class khan_oauth extends oauth_helper {
+class katest_oauth extends oauth_helper {
     /**
      * Request token for authentication
      * This is the first step to use OAuth, it will return oauth_token and oauth_token_secret
