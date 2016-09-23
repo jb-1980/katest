@@ -147,7 +147,7 @@ function get_khan_results($katest, $kaskills, $timestarted, $timesubmitted, $att
         'request_token_api'=>'http://www.khanacademy.org/api/auth/request_token',
         'access_token_api'=>'http://www.khanacademy.org/api/auth/access_token',
     );
-    $khanacademy = new khan_oauth($args);
+    $khanacademy = new katest_oauth($args);
 
     // 2. Get list of skills on quiz
     $kaskills = $DB->get_records('katest_skills',array('katestid'=>$katest->id));
