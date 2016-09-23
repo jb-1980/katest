@@ -27,7 +27,7 @@
 define(['jquery', 'core/ajax', 'core/notification'], function($, ajax, notification) {
     return /** @alias module:mod_katest/katest */ {
 
-        setButtions: function(){
+        setButtons: function(){
             $('.katest-skill-button').click(function() {
               $(this).addClass('katest-disabled');
             });
