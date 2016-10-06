@@ -23,16 +23,6 @@
  */
 
 $functions = array(
-
-    'mod_katest_post_grade' => array(
-        'classname'   => 'mod_katest\external',
-        'methodname'  => 'post_grade',
-        'classpath'   => '',
-        'description' => 'User Khan API to set a grade for user',
-        'type'        => 'write',
-        'capabilities'=> '',
-    ),
-
     'mod_katest_delete_attempt' => array(
         'classname'   => 'mod_katest\external',
         'methodname'  => 'delete_attempt',
