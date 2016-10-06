@@ -28,8 +28,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_katest';
-$plugin->version = 2016081500;
-$plugin->release = 'v0.0.2';
+$plugin->version = 2016100600;
+$plugin->release = 'v0.0.3';
 $plugin->requires = 2015051101;
 $plugin->maturity = MATURITY_ALPHA;
 $plugin->cron = 0;
