@@ -61,8 +61,8 @@ if($oauth_token and $oauth_token_secret and $oauth_verifier){
         'api_root'=>'http://www.khanacademy.org/',
         'oauth_consumer_key'=>$consumer_obj->consumer_key,
         'oauth_consumer_secret'=>$consumer_obj->consumer_secret,
-        'request_token_api'=>'http://www.khanacademy.org/api/auth/request_token',
-        'access_token_api'=>'http://www.khanacademy.org/api/auth/access_token',
+        'request_token_api'=>'https://www.khanacademy.org/api/auth2/request_token',
+        'access_token_api'=>'https://www.khanacademy.org/api/auth2/access_token',
         'oauth_callback'=>"{$CFG->wwwroot}/mod/katest/view.php?id={$id}"
     );
     $khanacademy = new katest_oauth($args);

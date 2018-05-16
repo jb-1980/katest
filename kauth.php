@@ -25,19 +25,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/locallib.php');
+require_once dirname(dirname(dirname(__FILE__))) . '/config.php';
+require_once dirname(__FILE__) . '/locallib.php';
 
 $cmid = optional_param('id', 0, PARAM_INT);
 
 $consumer_obj = get_config('katest');
 $args = array(
-    'api_root'=>'http://www.khanacademy.org/',
-    'oauth_consumer_key'=>$consumer_obj->consumer_key,
-    'oauth_consumer_secret'=>$consumer_obj->consumer_secret,
-    'request_token_api'=>'http://www.khanacademy.org/api/auth/request_token',
-    'access_token_api'=>'http://www.khanacademy.org/api/auth/access_token',
-    'oauth_callback'=>"{$CFG->wwwroot}/mod/katest/view.php?id={$cmid}"
+    'api_root' => 'http://www.khanacademy.org/',
+    'oauth_consumer_key' => $consumer_obj->consumer_key,
+    'oauth_consumer_secret' => $consumer_obj->consumer_secret,
+    'request_token_api' =>
+        'https://www.khanacademy.org/api/auth2/request_token',
+    'access_token_api' => 'https://www.khanacademy.org/api/auth2/access_token',
+    'authorize_token_api' => 'https://www.khanacademy.org/api/auth2/authorize',
+    'oauth_callback' => "{$CFG->wwwroot}/mod/katest/view.php?id={$cmid}"
 );
 $khanacademy = new katest_oauth($args);
-$khanacademy->request_token();
+$request_token = $khanacademy->request_token();

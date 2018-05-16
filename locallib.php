@@ -27,44 +27,53 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once($CFG->libdir.'/gradelib.php');
-require_once($CFG->libdir.'/oauthlib.php');
+require_once dirname(dirname(dirname(__FILE__))) . '/config.php';
+require_once $CFG->libdir . '/gradelib.php';
+require_once $CFG->libdir . '/oauthlib.php';
 
-class katest_oauth extends oauth_helper {
+class katest_oauth extends oauth_helper
+{
     /**
      * Request token for authentication
      * This is the first step to use OAuth, it will return oauth_token and oauth_token_secret
      * @return array
      */
-    public function request_token() {
+    public function request_token()
+    {
         global $CFG;
-        $this->sign_secret = $this->consumer_secret.'&';
-        $params = $this->prepare_oauth_parameters($this->request_token_api, array(), 'GET');
+        $this->sign_secret = $this->consumer_secret . '&';
+        $params = $this->prepare_oauth_parameters(
+            $this->request_token_api,
+            array(),
+            'GET'
+        );
         $url = $this->request_token_api;
         if (!empty($params)) {
             $url .= (stripos($url, '?') !== false) ? '&' : '?';
             $url .= http_build_query($params, '', '&');
         }
-        return redirect($url);
+        $request_token_string = file_get_contents($url);
+        $request_token = explode('&', $request_token_string)[1];
+        return redirect("https://www.khanacademy.org/api/auth2/authorize?".$request_token);
     }
 
-    public function parse_params($params,$exclude=array()){
+    public function parse_params($params, $exclude = array())
+    {
         ksort($params);
         $total = array();
-        foreach($params as $param=>$value){
-            if(in_array($param,$exclude)){
+        foreach ($params as $param => $value) {
+            if (in_array($param, $exclude)) {
                 continue;
             }
-            if(is_array($value)){
-                if(!empty($value)){
+            if (is_array($value)) {
+                if (!empty($value)) {
                     sort($value);
-                    foreach($value as $k=>$v){
-                        $total[] = $param.'='.rawurlencode($v);
+                    foreach ($value as $k => $v) {
+                        $total[] = $param . '=' . rawurlencode($v);
                     }
                 }
-            } else{
-                $total[] = $param.'='.rawurlencode($value);
+            } else {
+                $total[] = $param . '=' . rawurlencode($value);
             }
         }
         return $total;
@@ -82,15 +91,20 @@ class katest_oauth extends oauth_helper {
      * @param array $param
      * @return string
      */
-    function get_signable_parameters($params){
-        $total = $this->parse_params($params,$exclude=array('oauth_signature'));
+    function get_signable_parameters($params)
+    {
+        $total = $this->parse_params(
+            $params,
+            $exclude = array('oauth_signature')
+        );
         return implode('&', $total);
     }
 
-    public function setup_oauth_http_header($params) {
+    public function setup_oauth_http_header($params)
+    {
         $total = $this->parse_params($params);
         $str = implode(', ', $total);
-        $str = 'Authorization: OAuth '.$str;
+        $str = 'Authorization: OAuth ' . $str;
         $this->http->setHeader('Expect:');
         $this->http->setHeader($str);
     }
@@ -102,7 +116,13 @@ class katest_oauth extends oauth_helper {
      * @param string $token
      * @param string $secret
      */
-    public function request($method, $url, $params = array(), $token = '', $secret = '') {
+    public function request(
+        $method,
+        $url,
+        $params = array(),
+        $token = '',
+        $secret = ''
+    ) {
         if (empty($token)) {
             $token = $this->access_token;
         }
@@ -111,15 +131,22 @@ class katest_oauth extends oauth_helper {
         }
 
         // to access protected resource, sign_secret will always be consumer_secret+token_secret
-        $this->sign_secret = $this->consumer_secret.'&'.$secret;
+        $this->sign_secret = $this->consumer_secret . '&' . $secret;
 
-        $oauth_params = $this->prepare_oauth_parameters($url, array('oauth_token'=>$token) + $params, $method);
+        $oauth_params = $this->prepare_oauth_parameters(
+            $url,
+            array('oauth_token' => $token) + $params,
+            $method
+        );
         $this->setup_oauth_http_header($oauth_params);
         $url_params = $this->parse_params($params);
 
         $url .= (stripos($url, '?') !== false) ? '&' : '?';
-        $url .= implode('&',$url_params);
-        $content = call_user_func_array(array($this->http, 'get'), array($url,array(),$this->http_options));
+        $url .= implode('&', $url_params);
+        $content = call_user_func_array(
+            array($this->http, 'get'),
+            array($url, array(), $this->http_options)
+        );
         // reset http header and options to prepare for the next request
         $this->http->resetHeader();
         // return request return value
@@ -133,7 +160,13 @@ class katest_oauth extends oauth_helper {
  * @param stdClass $katest
  * @return string
  */
-function get_khan_results($katest, $kaskills, $timestarted, $timesubmitted, $attempt){
+function get_khan_results(
+    $katest,
+    $kaskills,
+    $timestarted,
+    $timesubmitted,
+    $attempt
+) {
     global $USER, $DB, $SESSION;
 
     // get data from Khan Academy and use to create a grade.
@@ -141,33 +174,39 @@ function get_khan_results($katest, $kaskills, $timestarted, $timesubmitted, $att
     // 1. Create khan academy auth object
     $consumer_obj = get_config('katest');
     $args = array(
-        'api_root'=>'http://www.khanacademy.org/',
-        'oauth_consumer_key'=>$consumer_obj->consumer_key,
-        'oauth_consumer_secret'=>$consumer_obj->consumer_secret,
-        'request_token_api'=>'http://www.khanacademy.org/api/auth/request_token',
-        'access_token_api'=>'http://www.khanacademy.org/api/auth/access_token',
+        'api_root' => 'http://www.khanacademy.org/',
+        'oauth_consumer_key' => $consumer_obj->consumer_key,
+        'oauth_consumer_secret' => $consumer_obj->consumer_secret,
+        'request_token_api' =>
+            'https://www.khanacademy.org/api/auth2/request_token',
+        'access_token_api' =>
+            'https://www.khanacademy.org/api/auth2/access_token'
     );
     $khanacademy = new katest_oauth($args);
 
     // 2. Get list of skills on quiz
-    $kaskills = $DB->get_records('katest_skills',array('katestid'=>$katest->id));
+    $kaskills = $DB->get_records('katest_skills', array(
+        'katestid' => $katest->id
+    ));
 
     // 3. Get data for each skill
     $katest_id = $katest->id;
-    $tokens = $SESSION->khanacademy_tokens->$katest_id;
+    $tokens = $SESSION->khanacademy_tokens->{$katest_id};
 
-    $params = array('dt_end'=>$timesubmitted,'dt_start'=>$timestarted);
+    $params = array('dt_end' => $timesubmitted, 'dt_start' => $timestarted);
     $token = $tokens['oauth_token'];
     $secret = $tokens['oauth_token_secret'];
 
     $results = array();
-    foreach($kaskills as $k=>$skill){
-        $skillname = explode('~',$skill->skillname)[0];
+    foreach ($kaskills as $k => $skill) {
+        $skillname = explode('~', $skill->skillname)[0];
         $url = "http://www.khanacademy.org/api/v1/user/exercises/{$skillname}/log";
-        $response = json_decode($khanacademy->request('GET',$url,$params,$token,$secret));
+        $response = json_decode(
+            $khanacademy->request('GET', $url, $params, $token, $secret)
+        );
 
-        foreach($response as $key => $val){
-            $result = new stdClass;
+        foreach ($response as $key => $val) {
+            $result = new stdClass();
             $result->katestid = $katest_id;
             $result->userid = $USER->id;
             $result->katestattempt = $attempt;
@@ -193,12 +232,13 @@ function get_khan_results($katest, $kaskills, $timestarted, $timesubmitted, $att
  * @param stdClass $kaskills, the kaskills object
  * @return float
  */
-function katest_calculate_grade($results, $katest, $kaskills){
+function katest_calculate_grade($results, $katest, $kaskills)
+{
     $total = count($kaskills);
 
     $grades = array();
-    foreach($results as $k=>$result){
-        if(array_key_exists($result->skillname, $grades)){
+    foreach ($results as $k => $result) {
+        if (array_key_exists($result->skillname, $grades)) {
             $grades[$result->skillname][] = $result;
         } else {
             $grades[$result->skillname] = array($result);
@@ -206,18 +246,14 @@ function katest_calculate_grade($results, $katest, $kaskills){
     }
 
     $num = 0;
-    $marks = array(
-      1=>1.0,
-      2=>0.75,
-      3=>0.5
-    );
-    foreach($grades as $k=>$grade){
+    $marks = array(1 => 1.0, 2 => 0.75, 3 => 0.5);
+    foreach ($grades as $k => $grade) {
         $count = 1;
-        foreach($grade as $key=> $g){
-            if($g->correct){
+        foreach ($grade as $key => $g) {
+            if ($g->correct) {
                 $num += $marks[$count];
                 break;
-            } elseif($count==3){
+            } elseif ($count == 3) {
                 break;
             }
             $count++;
@@ -236,20 +272,23 @@ function katest_calculate_grade($results, $katest, $kaskills){
         //         $num += 0.5;
         // }
     }
-    $finalgrade = $total ? $num/$total*$katest->grade : null;
+    $finalgrade = $total ? $num / $total * $katest->grade : null;
 
     return $finalgrade;
 }
 
-function katest_update_grade($courseid, $katestid, $userid, $grade){
-  $gradeitem = new grade_item(array(
-          'courseid'=>$courseid,
-          'itemmodule'=>'katest',
-          'iteminstance'=>$katestid));
-  return $grade;
+function katest_update_grade($courseid, $katestid, $userid, $grade)
+{
+    $gradeitem = new grade_item(array(
+        'courseid' => $courseid,
+        'itemmodule' => 'katest',
+        'iteminstance' => $katestid
+    ));
+    return $grade;
 }
 
-function katest_choose_renderer($katest, $cmid, $password=null){
+function katest_choose_renderer($katest, $cmid, $password = null)
+{
     global $CFG, $DB, $SESSION, $USER;
 
     // Check to make sure number of attempts has not been exceeded
@@ -260,16 +299,18 @@ function katest_choose_renderer($katest, $cmid, $password=null){
     $num_attempts = $DB->count_records_sql($attempts_sql);
 
     // If attempts exceeded, return attempts_exceeded screen
-    if($katest->attempts && ($num_attempts + 1 > $katest->attempts)){
-        print_object(array($num_attempts,$katest->attempts));
+    if ($katest->attempts && ($num_attempts + 1 > $katest->attempts)) {
+        print_object(array($num_attempts, $katest->attempts));
         return new \mod_katest\output\attempts_exceeded();
     }
 
     // Everything has been authorized, so we can send them the index page
-    if(isset($SESSION->khanacademy_tokens)
-         && property_exists($SESSION->khanacademy_tokens,$katest->id)){
+    if (
+        isset($SESSION->khanacademy_tokens) &&
+        property_exists($SESSION->khanacademy_tokens, $katest->id)
+    ) {
         // All authentication has be passed, we can start the test
-        return new \mod_katest\output\index($katest,$num_attempts,$cmid);
+        return new \mod_katest\output\index($katest, $num_attempts, $cmid);
     }
 
     /** Authorization
@@ -277,19 +318,23 @@ function katest_choose_renderer($katest, $cmid, $password=null){
      *  move to Khan Authorization page. Otherwise, we will just go straight
      *  the Khan Authorization page.
      */
-    if($katest->password) { // Authenticate password if required
-        if($password){
-          if($password == $katest->password){
-              // password is correct, now let's make sure that we can sync up with khan
-              return new \mod_katest\output\khan_authenticate($cmid);
-          } else{ // incorrect password
-              $msg = get_string('error_msg', 'katest');
-              return new \mod_katest\output\password($msg);
-          }
-        } else{ //password has not been submitted, send password page
-          return new \mod_katest\output\password();
+    if ($katest->password) {
+        // Authenticate password if required
+        if ($password) {
+            if ($password == $katest->password) {
+                // password is correct, now let's make sure that we can sync up with khan
+                return new \mod_katest\output\khan_authenticate($cmid);
+            } else {
+                // incorrect password
+                $msg = get_string('error_msg', 'katest');
+                return new \mod_katest\output\password($msg);
+            }
+        } else {
+            //password has not been submitted, send password page
+            return new \mod_katest\output\password();
         }
-    } else{ // no password required, so let's just get Khan Authorization
+    } else {
+        // no password required, so let's just get Khan Authorization
         return new \mod_katest\output\khan_authenticate($cmid);
     }
     // Something was missed. This should raise an error
